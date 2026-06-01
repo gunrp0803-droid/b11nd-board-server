@@ -1,5 +1,6 @@
 package com.example.b11ndboard.entity;
 
+import com.example.b11ndboard.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -26,21 +27,16 @@ public class Post {
     @Column(nullable = false)
     private Long userId;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
     @Builder
     public Post(String title, String content, Long userId) {
         this.title = title;
         this.content = content;
         this.userId = userId;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+
     }
 
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
-        this.updatedAt = LocalDateTime.now();
     }
 }
