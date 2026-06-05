@@ -1,5 +1,6 @@
 package com.example.b11ndboard.entity;
 
+import com.example.b11ndboard.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "posts")
-public class Post {
+public class Post extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,25 +23,20 @@ public class Post {
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
+
     //JWT 완성하기 전까지는 임시로 숫자를 넣거나 static하게 검증할 작성자 ID
     @Column(nullable = false)
     private Long userId;
-
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     @Builder
     public Post(String title, String content, Long userId) {
         this.title = title;
         this.content = content;
         this.userId = userId;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
-        this.updatedAt = LocalDateTime.now();
     }
 }
