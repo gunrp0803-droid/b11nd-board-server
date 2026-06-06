@@ -2,13 +2,10 @@ package com.example.b11ndboard.global.exception;
 
 import com.example.b11ndboard.global.common.ApiResponse;
 import com.example.b11ndboard.global.common.ResponseKind;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -19,11 +16,12 @@ public class GlobalExceptionHandler {
     ) {
         String message = e.getBindingResult().getFieldErrors()
                 .stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .collect(Collectors.joining(", "));
+                .map(error -> error.getDefaultMessage())
+                .findFirst()
+                .orElse(ErrorCode.VALIDATION_FAILED.getMessage());
 
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(ErrorCode.VALIDATION_FAILED.getStatus())
                 .body(ApiResponse.fail(message, ResponseKind.VALIDATION_ERROR));
     }
 
@@ -47,5 +45,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(errorCode.getStatus())
                 .body(ApiResponse.fail(errorCode.getMessage(), ResponseKind.SIGNUP));
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleValidationException(
+            ValidationException e
+    ) {
+        ErrorCode errorCode = e.getErrorCode();
+
+        return ResponseEntity
+                .status(errorCode.getStatus())
+                .body(ApiResponse.fail(errorCode.getMessage(), ResponseKind.VALIDATION_ERROR));
     }
 }
