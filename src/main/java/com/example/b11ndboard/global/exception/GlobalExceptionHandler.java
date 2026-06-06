@@ -1,7 +1,7 @@
-package com.example.b11ndboard.auth.exception;
+package com.example.b11ndboard.global.exception;
 
-import com.example.b11ndboard.auth.common.ApiResponse;
-import com.example.b11ndboard.auth.common.ResponseKind;
+import com.example.b11ndboard.global.common.ApiResponse;
+import com.example.b11ndboard.global.common.ResponseKind;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

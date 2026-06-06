@@ -1,8 +1,8 @@
-package com.example.b11ndboard.auth.jwt;
+package com.example.b11ndboard.auth.security;
 
 import com.example.b11ndboard.auth.entity.Users;
-import com.example.b11ndboard.auth.exception.ErrorCode;
-import com.example.b11ndboard.auth.exception.LoginException;
+import com.example.b11ndboard.global.exception.ErrorCode;
+import com.example.b11ndboard.global.exception.LoginException;
 import com.example.b11ndboard.auth.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

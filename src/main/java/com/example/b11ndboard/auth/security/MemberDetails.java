@@ -1,4 +1,4 @@
-package com.example.b11ndboard.auth.jwt;
+package com.example.b11ndboard.auth.security;
 
 import com.example.b11ndboard.auth.entity.Users;
 import lombok.RequiredArgsConstructor;

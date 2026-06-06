@@ -1,5 +1,6 @@
 package com.example.b11ndboard.auth.jwt;
 
+import com.example.b11ndboard.auth.security.MemberDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

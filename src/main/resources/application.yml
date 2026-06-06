@@ -16,3 +16,10 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
+
+app:
+  jwt:
+    secret: ${JWT-SECRET}
+    access-expiration: ${JWT_ACCESS_EXPIRATION}
+  cookie:
+    secure: false
