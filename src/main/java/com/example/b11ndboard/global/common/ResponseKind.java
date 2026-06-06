@@ -1,4 +1,4 @@
-package com.example.b11ndboard.auth.common;
+package com.example.b11ndboard.global.common;
 
 public enum ResponseKind {
     SIGNUP,
