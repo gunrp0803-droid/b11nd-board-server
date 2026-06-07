@@ -7,7 +7,6 @@ import com.example.b11ndboard.global.common.ResponseKind;
 import com.example.b11ndboard.global.exception.SignUpException;
 import com.example.b11ndboard.auth.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

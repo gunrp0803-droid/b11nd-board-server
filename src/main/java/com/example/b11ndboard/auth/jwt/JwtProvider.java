@@ -24,17 +24,24 @@ public class JwtProvider {
     private static final String TOKEN_TYPE = "ACCESS";
     private static final String ROLE_CLAIM = "role";
 
+    private  static final String ACCESS_TOKEN_TYPE = "ACCESS";
+    private static final String REFRESH_TOKEN_TYPE = "REFRESH";
+
     private final SecretKey secretKey;
 
+    @Getter
+    private final long refreshExpiration;
     @Getter
     private final long accessExpiration;
 
     public JwtProvider(
             @Value("${app.jwt.secret}") String secret,
-            @Value("${app.jwt.access-expiration}") long accessExpiration
+            @Value("${app.jwt.access-expiration}") long accessExpiration,
+            @Value("${app.jwt.refresh-expiration}") long refreshExpiration
     ) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.accessExpiration = accessExpiration;
+        this.refreshExpiration = refreshExpiration;
     }
 
     public String generateAccessToken(String username, Role role) {
@@ -95,5 +102,50 @@ public class JwtProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public String generateRefreshToken(String username, Role role) {
+        Date now = new Date();
+        Date expiration = new Date(now.getTime() + refreshExpiration);
+
+        return Jwts.builder()
+                .subject(username)
+                .claim("type", REFRESH_TOKEN_TYPE)
+                .claim(ROLE_CLAIM, role.name())
+                .issuedAt(now)
+                .expiration(expiration)
+                .signWith(secretKey)
+                .compact();
+    }
+
+    public boolean validateAccessToken(String token) {
+        return validateTokenType(token, ACCESS_TOKEN_TYPE);
+    }
+
+    public boolean validateRefreshToken(String token) {
+        return validateTokenType(token, REFRESH_TOKEN_TYPE);
+    }
+
+    private boolean validateTokenType(String token, String type) {
+        try {
+            Claims claims = parseClaims(token);
+            return type.equals(claims.get("type", String.class));
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public String resolveRefreshToken(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies == null) {
+            return null;
+        }
+
+        return Arrays.stream(cookies)
+                .filter(cookie -> "refreshToken".equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
     }
 }

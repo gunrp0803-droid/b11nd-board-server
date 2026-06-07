@@ -3,6 +3,7 @@ package com.example.b11ndboard.auth.controller;
 import com.example.b11ndboard.global.common.ApiResponse;
 import com.example.b11ndboard.auth.dto.request.LoginRequest;
 import com.example.b11ndboard.auth.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +18,18 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<String>> login(
+    public ResponseEntity<ApiResponse<Void>> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletResponse response
     ) {
         return ResponseEntity.ok(authService.login(request, response));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<Void>> refresh(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        return ResponseEntity.ok(authService.refresh(request, response));
     }
 }
