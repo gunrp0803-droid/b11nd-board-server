@@ -1,5 +1,7 @@
 package com.example.b11ndboard.service;
 
+import com.example.b11ndboard.dto.PostRequestDto;
+import com.example.b11ndboard.dto.PostResponseDto;
 import com.example.b11ndboard.entity.Post;
 import com.example.b11ndboard.entity.PostLike;
 import com.example.b11ndboard.repository.PostLikeRepository;
@@ -8,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -15,6 +20,25 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
+
+    @Transactional
+    public PostResponseDto createPost(PostRequestDto requestDto, Long userId) {
+        Post post = Post.builder()
+                .title(requestDto.getTitle())
+                .content(requestDto.getContent())
+                .userId(userId)
+                .build();
+
+        Post savedPost = postRepository.save(post);
+        return new PostResponseDto(savedPost);
+    }
+
+    // 2. 전체 게시글 목록 조회
+    public List<PostResponseDto> getAllPosts() {
+        return postRepository.findAll().stream()
+                .map(PostResponseDto::new)
+                .collect(Collectors.toList());
+    }
 
     @Transactional
     public void likePost(Long postId, Long userId) {
