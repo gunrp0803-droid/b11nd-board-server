@@ -1,13 +1,13 @@
-package com.example.b11ndboard.comment.DTO;
+package com.example.b11ndboard.comment.dto;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-public class CommentDto {
-    @Getter
-    @NoArgsConstructor
-
-    
-
-
+//댓글 등록용
+@Getter
+@RequiredArgsConstructor
+public class CommentRequestDto{
+    private String Content;
+    private String Writer;
 }
+
