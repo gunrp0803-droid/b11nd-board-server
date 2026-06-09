@@ -1,8 +1,8 @@
 package com.example.b11ndboard.comment.controller;
 
 
-import com.example.b11ndboard.comment.dto.CommentRequestDto;
-import com.example.b11ndboard.comment.dto.CommentResponseDto;
+import com.example.b11ndboard.comment.dto.request.CommentRequest;
+import com.example.b11ndboard.comment.dto.response.CommentResponse;
 import com.example.b11ndboard.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,15 +19,15 @@ public class CommentApiController {
     //댓글 api
     @PostMapping("/{boardId}/comments")
     public ResponseEntity<String> createComment(@PathVariable Long boardId,
-                                                @RequestBody CommentRequestDto dto){
+                                                @RequestBody CommentRequest dto){
         commentService.saveComment(boardId,dto);
         return ResponseEntity.ok("댓글이 등록 되었습니다");
     }
 
     //댓글 목록 조회 api
     @GetMapping("/{boardId}/comments")
-    public ResponseEntity<List<CommentResponseDto>> getCommentList(@PathVariable Long boardId){
-        List<CommentResponseDto> comments = commentService.getComments(boardId);
+    public ResponseEntity<List<CommentResponse>> getCommentList(@PathVariable Long boardId){
+        List<CommentResponse> comments = commentService.getComments(boardId);
         return ResponseEntity.ok(comments);
     }
 }
