@@ -4,9 +4,15 @@ import com.example.b11ndboard.dto.PostRequestDto;
 import com.example.b11ndboard.dto.PostResponseDto;
 import com.example.b11ndboard.entity.Post;
 import com.example.b11ndboard.entity.PostLike;
+import com.example.b11ndboard.global.exception.ErrorCode;
+import com.example.b11ndboard.global.exception.PostException;
 import com.example.b11ndboard.repository.PostLikeRepository;
 import com.example.b11ndboard.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +27,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
 
+    // 1. 게시글 생성
     @Transactional
     public PostResponseDto createPost(PostRequestDto requestDto, Long userId) {
         Post post = Post.builder()
@@ -40,23 +47,78 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public void likePost(Long postId, Long userId) {
-        // 1. 해당 게시글이 존재하는지 확인
+    // 3. 게시글 상세 조회
+    public PostResponseDto getPost(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
+        return new PostResponseDto(post);
+    }
 
-        // 2. 이미 이 유저가 해당 게시글에 좋아요를 눌렀는지 확인
-        if (postLikeRepository.existsByUserIdAndPost(userId, post)) {
-            throw new IllegalStateException("이미 좋아요를 누른 게시글입니다.");
+    // 4. 게시글 수정
+    @Transactional
+    public PostResponseDto updatePost(Long postId, PostRequestDto requestDto, Long userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
+
+        // 작성자 검증
+        if (!post.getUserId().equals(userId)) {
+            throw new PostException(ErrorCode.NOT_POST_AUTHOR);
         }
 
-        // 3. 처음 누르는 거라면 좋아요 데이터 저장
+        post.update(requestDto.getTitle(), requestDto.getContent());
+        return new PostResponseDto(post);
+    }
+
+    // 5. 게시글 삭제
+    @Transactional
+    public void deletePost(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
+
+        // 작성자 검증
+        if (!post.getUserId().equals(userId)) {
+            throw new PostException(ErrorCode.NOT_POST_AUTHOR);
+        }
+
+        postRepository.delete(post);
+    }
+
+    // 6. 좋아요 로직
+    @Transactional
+    public void likePost(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
+
+        if (postLikeRepository.existsByUserIdAndPost(userId, post)) {
+            throw new PostException(ErrorCode.ALREADY_LIKED);
+        }
+
         PostLike postLike = PostLike.builder()
                 .userId(userId)
                 .post(post)
                 .build();
 
         postLikeRepository.save(postLike);
+    }
+    public Page<PostResponseDto> getAllPosts(int page){
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<Post> postPage = postRepository.findAll(pageable);
+
+        return postPage.map(PostResponseDto::new);
+    }
+    public PostResponseDto getPost(Long postId, Long userId) {
+        // 1. 게시글이 존재하는지 확인
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
+
+        // 2. 이 게시글의 총 좋아요 개수 가져오기
+        long likeCount = postLikeRepository.countByPost(post);
+
+        // 3. 현재 로그인한 유저가 이 글에 좋아요를 눌렀는지 여부 가져오기
+        boolean liked = postLikeRepository.existsByUserIdAndPost(userId, post);
+
+        // 4. 확장된 DTO 생성자를 통해 최종 결과 반환
+        return new PostResponseDto(post, likeCount, liked);
     }
 }
