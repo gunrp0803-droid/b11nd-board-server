@@ -1,6 +1,5 @@
 package com.example.b11ndboard.comment.entity;
 
-
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

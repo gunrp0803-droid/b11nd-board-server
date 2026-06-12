@@ -29,6 +29,11 @@ public class MemberDetails implements UserDetails {
         return users.getUsername();
     }
 
+    public Long getUserId(){
+        return users.getUserId();
+    }
+
+
     @Override
     public boolean isAccountNonExpired() {
         return UserDetails.super.isAccountNonExpired();
