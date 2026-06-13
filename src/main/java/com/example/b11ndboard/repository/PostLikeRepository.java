@@ -1,7 +1,7 @@
 package com.example.b11ndboard.repository;
 
-import com.example.b11ndboard.entity.Post;
-import com.example.b11ndboard.entity.PostLike;
+import com.example.b11ndboard.post.entity.Post;
+import com.example.b11ndboard.post.entity.PostLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {

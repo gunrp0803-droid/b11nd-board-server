@@ -1,6 +1,6 @@
 package com.example.b11ndboard.repository;
 
-import com.example.b11ndboard.entity.Post;
+import com.example.b11ndboard.post.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

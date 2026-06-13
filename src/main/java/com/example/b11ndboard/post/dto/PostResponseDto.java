@@ -1,6 +1,6 @@
-package com.example.b11ndboard.dto;
+package com.example.b11ndboard.post.dto;
 
-import com.example.b11ndboard.entity.Post;
+import com.example.b11ndboard.post.entity.Post;
 import lombok.Getter;
 import java.time.LocalDateTime;
 

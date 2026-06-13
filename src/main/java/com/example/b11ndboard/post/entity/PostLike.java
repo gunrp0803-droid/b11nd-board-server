@@ -1,4 +1,4 @@
-package com.example.b11ndboard.entity;
+package com.example.b11ndboard.post.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -29,10 +29,10 @@ public class PostLike {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    private com.example.b11ndboard.post.entity.Post post;
 
     @Builder
-    public PostLike(Long userId, Post post) {
+    public PostLike(Long userId, com.example.b11ndboard.post.entity.Post post) {
         this.userId = userId;
         this.post = post;
     }
