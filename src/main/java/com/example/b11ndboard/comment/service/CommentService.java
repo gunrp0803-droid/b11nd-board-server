@@ -1,8 +1,7 @@
 package com.example.b11ndboard.comment.service;
 
-import com.example.b11ndboard.comment.dto.request.CommentRequest;
-import com.example.b11ndboard.comment.dto.response.CommentResponse;
 import com.example.b11ndboard.comment.entity.Comment;
+import com.example.b11ndboard.post.entity.Post;
 import com.example.b11ndboard.comment.repository.CommentRepository;
 import com.example.b11ndboard.commentlike.dto.CommentRequestDto;
 import com.example.b11ndboard.commentlike.dto.CommentResponseDto;
@@ -27,23 +26,23 @@ public class CommentService {
 
     @Transactional
     public Long saveComment(Long boardId , CommentRequestDto dto){
-        Board board = BoardRepository.findbyId(boardId)
+        Post post = PostRepository.findbyId(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 개시글은 존재하지 않습니다"));
 
         Comment comment = Comment.builder()
                 .content(dto.getContent())
                 .writer(dto.getWriter())
-                .board(board)
+                .post(post)
                 .build();
         return commentRepository.save(comment).getId();
     }
 
     public List<CommentResponseDto> getComments(Long boardId){
-        List<Comment> comments = commentRepository.findbyBoardIdOrderByCreatedAtAsc(boardId);
+        List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(boardId);
 
         return comments.stream()
                 .map(comment -> {
-                    // 각 댓글마다 DB에서 좋아요 개수를 세어 함께 DTO로 변환합니다.
+                    // 각 댓글마다 DB에서 좋아요 개수를 세어 함께 DTO로 변환
                     long likeCount = commentLikeRepository.countByCommentId(comment.getId());
                     return new CommentResponseDto(comment, likeCount);
                 })

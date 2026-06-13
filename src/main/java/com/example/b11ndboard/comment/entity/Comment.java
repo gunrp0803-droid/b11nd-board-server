@@ -1,5 +1,6 @@
 package com.example.b11ndboard.comment.entity;
 
+import com.example.b11ndboard.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +22,7 @@ public class Comment {
     //여러 댓글이 하나의 게시글에 속함
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id",nullable = false)
-    private Board board;
+    private Post post;
 
     private String writer;
 
