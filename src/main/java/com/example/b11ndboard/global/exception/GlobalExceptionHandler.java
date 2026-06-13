@@ -57,22 +57,4 @@ public class GlobalExceptionHandler {
                 .status(errorCode.getStatus())
                 .body(ApiResponse.fail(errorCode.getMessage(), ResponseKind.VALIDATION_ERROR));
     }
-
-    @ExceptionHandler(PostException.class)
-    public ResponseEntity<ApiResponse<Void>> handlePostException(
-            PostException e
-    ) {
-        ErrorCode errorCode = e.getErrorCode();
-
-        return ResponseEntity
-                .status(errorCode.getStatus())
-                .body(ApiResponse.fail(errorCode.getMessage(), ResponseKind.VALIDATION_ERROR));
-    }
-    //게시판 비즈니스 로직 예외 처리 (수정/삭제 권한 및 존재 유무 처리)
-    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
-    public ResponseEntity<ApiResponse<Void>> handleBoardException(RuntimeException e) {
-        return ResponseEntity
-                .status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.fail(e.getMessage(), ResponseKind.VALIDATION_ERROR));
-    }
 }
