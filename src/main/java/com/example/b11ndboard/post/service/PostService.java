@@ -1,13 +1,13 @@
-package com.example.b11ndboard.service;
+package com.example.b11ndboard.post.service;
 
-import com.example.b11ndboard.dto.PostRequestDto;
-import com.example.b11ndboard.dto.PostResponseDto;
-import com.example.b11ndboard.entity.Post;
-import com.example.b11ndboard.entity.PostLike;
+import com.example.b11ndboard.post.dto.PostRequestDto;
+import com.example.b11ndboard.post.dto.PostResponseDto;
+import com.example.b11ndboard.post.entity.Post;
+import com.example.b11ndboard.post.entity.PostLike;
 import com.example.b11ndboard.global.exception.ErrorCode;
-import com.example.b11ndboard.global.exception.PostException;
-import com.example.b11ndboard.repository.PostLikeRepository;
-import com.example.b11ndboard.repository.PostRepository;
+import com.example.b11ndboard.post.exception.PostException;
+import com.example.b11ndboard.post.repository.PostLikeRepository;
+import com.example.b11ndboard.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

@@ -1,11 +1,11 @@
-package com.example.b11ndboard.controller;
+package com.example.b11ndboard.post.controller;
 
 import com.example.b11ndboard.auth.security.MemberDetails;
-import com.example.b11ndboard.dto.PostRequestDto;
-import com.example.b11ndboard.dto.PostResponseDto;
+import com.example.b11ndboard.post.dto.PostRequestDto;
+import com.example.b11ndboard.post.dto.PostResponseDto;
 import com.example.b11ndboard.global.common.ApiResponse;
 import com.example.b11ndboard.global.common.ResponseKind;
-import com.example.b11ndboard.service.PostService;
+import com.example.b11ndboard.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,16 +27,16 @@ public class PostController {
             @AuthenticationPrincipal MemberDetails memberDetails,
             @Valid @RequestBody PostRequestDto requestDto) {
 
-        PostResponseDto response = postService.createPost(requestDto, memberDetails.getUserId());
+        com.example.b11ndboard.post.dto.PostResponseDto response = postService.createPost(requestDto, memberDetails.getUserId());
         return ResponseEntity.ok(ApiResponse.ok("게시글이 성공적으로 작성되었습니다.", ResponseKind.VALIDATION_ERROR, response));
     }
 
     // 2. 전체 게시글 목록 조회 API (R) - 페이징 처리 반영 완료
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<PostResponseDto>>> getAllPosts(
+    public ResponseEntity<ApiResponse<Page<com.example.b11ndboard.post.dto.PostResponseDto>>> getAllPosts(
             @RequestParam(value = "page", defaultValue = "0") int page
     ) {
-        Page<PostResponseDto> response = postService.getAllPosts(page);
+        Page<com.example.b11ndboard.post.dto.PostResponseDto> response = postService.getAllPosts(page);
         return ResponseEntity.ok(
                 ApiResponse.ok("전체 게시글 목록 조회 (페이지: " + page + ")", ResponseKind.VALIDATION_ERROR, response)
         );
@@ -44,11 +44,11 @@ public class PostController {
 
     // 3. 게시글 상세 조회 API (R) - 좋아요 총 개수 및 내 좋아요 여부 포함
     @GetMapping("/{postId}")
-    public ResponseEntity<ApiResponse<PostResponseDto>> getPost(
+    public ResponseEntity<ApiResponse<com.example.b11ndboard.post.dto.PostResponseDto>> getPost(
             @PathVariable Long postId,
             @AuthenticationPrincipal MemberDetails memberDetails
     ) {
-        PostResponseDto response = postService.getPost(postId, memberDetails.getUserId());
+        com.example.b11ndboard.post.dto.PostResponseDto response = postService.getPost(postId, memberDetails.getUserId());
         return ResponseEntity.ok(
                 ApiResponse.ok("게시글 상세 조회", ResponseKind.VALIDATION_ERROR, response)
         );
@@ -56,12 +56,12 @@ public class PostController {
 
     // 4. 게시글 수정 API (U)
     @PutMapping("/{postId}")
-    public ResponseEntity<ApiResponse<PostResponseDto>> updatePost(
+    public ResponseEntity<ApiResponse<com.example.b11ndboard.post.dto.PostResponseDto>> updatePost(
             @PathVariable Long postId,
             @AuthenticationPrincipal MemberDetails memberDetails,
-            @Valid @RequestBody PostRequestDto requestDto) {
+            @Valid @RequestBody com.example.b11ndboard.post.dto.PostRequestDto requestDto) {
 
-        PostResponseDto response = postService.updatePost(postId, requestDto, memberDetails.getUserId());
+        com.example.b11ndboard.post.dto.PostResponseDto response = postService.updatePost(postId, requestDto, memberDetails.getUserId());
         return ResponseEntity.ok(
                 ApiResponse.ok("게시글이 성공적으로 수정되었습니다.", ResponseKind.VALIDATION_ERROR, response)
         );

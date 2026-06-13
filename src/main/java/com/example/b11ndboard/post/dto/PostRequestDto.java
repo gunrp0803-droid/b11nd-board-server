@@ -1,4 +1,4 @@
-package com.example.b11ndboard.dto;
+package com.example.b11ndboard.post.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

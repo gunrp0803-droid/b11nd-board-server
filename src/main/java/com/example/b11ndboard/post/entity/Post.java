@@ -1,4 +1,4 @@
-package com.example.b11ndboard.entity;
+package com.example.b11ndboard.post.entity;
 
 import com.example.b11ndboard.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -6,8 +6,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter

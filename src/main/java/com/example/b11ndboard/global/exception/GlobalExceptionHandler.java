@@ -2,6 +2,7 @@ package com.example.b11ndboard.global.exception;
 
 import com.example.b11ndboard.global.common.ApiResponse;
 import com.example.b11ndboard.global.common.ResponseKind;
+import com.example.b11ndboard.post.exception.PostException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;

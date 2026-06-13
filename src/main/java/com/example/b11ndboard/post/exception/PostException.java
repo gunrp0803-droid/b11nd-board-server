@@ -1,5 +1,6 @@
-package com.example.b11ndboard.global.exception;
+package com.example.b11ndboard.post.exception;
 
+import com.example.b11ndboard.global.exception.ErrorCode;
 import lombok.Getter;
 
 @Getter
