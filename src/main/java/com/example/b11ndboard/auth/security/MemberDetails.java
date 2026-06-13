@@ -13,6 +13,10 @@ import java.util.List;
 public class MemberDetails implements UserDetails {
 
     private final Users users;
+    //추가된 메서드: 현재 로그인한 유저의 고유 ID(PK)를 반환
+    public Long getUserId() {
+        return users.getUserId();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
