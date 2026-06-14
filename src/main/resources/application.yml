@@ -3,24 +3,26 @@ spring:
     name: b11nd-board
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PW}
+    url: ${B11ND_DB_URL:jdbc:mysql://localhost:3307/b11nd_board?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul}
+    username: ${B11ND_DB_USERNAME:b11nd}
+    password: ${B11ND_DB_PASSWORD:b11nd}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
+        physical_naming_strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        id:
+          db_structure_naming_strategy: legacy
 
 app:
   jwt:
-    secret: ${JWT-SECRET}
-    access-expiration: ${JWT_ACCESS_EXPIRATION}
-    refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+    secret: ${B11ND_JWT_SECRET:vmb706arhk9978p59560f6998p59560f6998p59560f6998p59560f}
+    access-expiration: ${B11ND_JWT_ACCESS_EXPIRATION:3600000}
+    refresh-expiration: ${B11ND_JWT_REFRESH_EXPIRATION:1209600000}
   cookie:
     secure: false

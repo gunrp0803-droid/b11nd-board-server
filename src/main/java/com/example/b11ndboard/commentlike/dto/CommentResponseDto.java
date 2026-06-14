@@ -17,7 +17,7 @@ public class CommentResponseDto {
         this.id = comment.getId();
         this.content = comment.getContent();
         this.writer = comment.getWriter();
-        this.createdAt = comment.getCreatedAt().toString();
+        this.createdAt = comment.getCreatedAt() != null ? comment.getCreatedAt().toString() : "";
         this.likeCount = likeCount;
     }
 }

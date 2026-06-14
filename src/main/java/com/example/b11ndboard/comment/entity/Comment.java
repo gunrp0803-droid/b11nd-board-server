@@ -1,39 +1,40 @@
 package com.example.b11ndboard.comment.entity;
 
+import com.example.b11ndboard.global.entity.BaseTimeEntity;
 import com.example.b11ndboard.post.entity.Post;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
-@NoArgsConstructor
-public class Comment {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "comments")
+public class Comment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    //여러 댓글이 하나의 게시글에 속함
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id",nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
+    @Column(nullable = false)
     private String writer;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
-
     @Builder
-    public Comment(String content , Board board , String writer){
+    public Comment(String content, Post post, String writer) {
         this.content = content;
-        this.board = board;
+        this.post = post;
         this.writer = writer;
     }
 
-
+    public void update(String content) {
+        this.content = content;
+    }
 }

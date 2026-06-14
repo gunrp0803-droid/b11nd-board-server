@@ -83,22 +83,25 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    // 6. 좋아요 로직
+    // 6. 좋아요 토글 로직
     @Transactional
-    public void likePost(Long postId, Long userId) {
+    public boolean likePost(Long postId, Long userId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글은 존재하지 않습니다"));
 
-        if (postLikeRepository.existsByUserIdAndPost(userId, post)) {
-            throw new PostException(ErrorCode.ALREADY_LIKED);
-        }
-
-        PostLike postLike = PostLike.builder()
-                .userId(userId)
-                .post(post)
-                .build();
-
-        postLikeRepository.save(postLike);
+        return postLikeRepository.findByUserIdAndPost(userId, post)
+                .map(postLike -> {
+                    postLikeRepository.delete(postLike);
+                    return false; // 좋아요 취소됨
+                })
+                .orElseGet(() -> {
+                    PostLike postLike = PostLike.builder()
+                            .userId(userId)
+                            .post(post)
+                            .build();
+                    postLikeRepository.save(postLike);
+                    return true; // 좋아요 생성됨
+                });
     }
     public Page<PostResponseDto> getAllPosts(int page){
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdAt"));

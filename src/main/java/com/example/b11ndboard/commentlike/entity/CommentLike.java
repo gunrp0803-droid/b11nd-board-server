@@ -3,12 +3,13 @@ package com.example.b11ndboard.commentlike.entity;
 import com.example.b11ndboard.auth.entity.Users;
 import com.example.b11ndboard.comment.entity.Comment;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Table(name = "comment_likes")
 public class CommentLike {
 
@@ -17,16 +18,16 @@ public class CommentLike {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id",nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id",nullable = false)
+    @JoinColumn(name = "comment_id", nullable = false)
     private Comment comment;
 
-    public CommentLike(Users user , Comment comment){
+    @Builder
+    public CommentLike(Users user, Comment comment) {
         this.user = user;
         this.comment = comment;
     }
-
 }

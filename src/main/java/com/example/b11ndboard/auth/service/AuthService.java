@@ -64,4 +64,9 @@ public class AuthService {
 
         return ApiResponse.ok("토큰 재발급 성공", ResponseKind.LOGIN, null);
     }
+
+    public ApiResponse<Void> logout(HttpServletResponse response) {
+        tokenService.logout(response);
+        return ApiResponse.ok("로그아웃 성공", ResponseKind.LOGIN, null);
+    }
 }

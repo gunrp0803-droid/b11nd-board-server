@@ -14,7 +14,12 @@ public enum ErrorCode {
     SIGNUP_EMAIL_EMPTY(HttpStatus.BAD_REQUEST, "이메일을 입력해주세요."),
     SIGNUP_USERNAME_USED(HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다."),
     SIGNUP_EMAIL_USED(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
-    VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "입력값이 올바르지 않습니다.");
+    VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "입력값이 올바르지 않습니다."),
+    
+    // Post
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 게시글을 찾을 수 없습니다."),
+    NOT_POST_AUTHOR(HttpStatus.FORBIDDEN, "게시글 수정/삭제 권한이 없습니다."),
+    ALREADY_LIKED(HttpStatus.CONFLICT, "이미 좋아요를 누른 게시글입니다.");
 
     @Getter
     private final HttpStatus status;

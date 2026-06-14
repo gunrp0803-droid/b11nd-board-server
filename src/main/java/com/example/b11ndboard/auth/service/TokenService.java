@@ -49,4 +49,23 @@ public class TokenService {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
+
+    public void logout(HttpServletResponse response) {
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", "")
+                .path("/")
+                .httpOnly(false)
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", "")
+                .path("/")
+                .httpOnly(false)
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+    }
 }

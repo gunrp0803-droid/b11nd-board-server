@@ -6,6 +6,6 @@ import com.example.b11ndboard.post.entity.Post;
 
 import java.util.List;
 
-public interface CommentRepository extends JpaRepository<Comment,Long> {
+public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByPostIdOrderByCreatedAtAsc(Long postId);
 }

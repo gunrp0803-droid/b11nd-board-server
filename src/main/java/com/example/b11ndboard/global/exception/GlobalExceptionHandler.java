@@ -3,6 +3,7 @@ package com.example.b11ndboard.global.exception;
 import com.example.b11ndboard.global.common.ApiResponse;
 import com.example.b11ndboard.global.common.ResponseKind;
 import com.example.b11ndboard.post.exception.PostException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -57,5 +58,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(errorCode.getStatus())
                 .body(ApiResponse.fail(errorCode.getMessage(), ResponseKind.VALIDATION_ERROR));
+    }
+
+    @ExceptionHandler(PostException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePostException(
+            PostException e
+    ) {
+        ErrorCode errorCode = e.getErrorCode();
+
+        return ResponseEntity
+                .status(errorCode.getStatus())
+                .body(ApiResponse.fail(errorCode.getMessage(), ResponseKind.VALIDATION_ERROR));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(
+            IllegalArgumentException e
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.fail(e.getMessage(), ResponseKind.VALIDATION_ERROR));
     }
 }
