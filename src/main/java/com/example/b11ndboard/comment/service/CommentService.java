@@ -6,6 +6,7 @@ import com.example.b11ndboard.comment.repository.CommentRepository;
 import com.example.b11ndboard.commentlike.dto.CommentRequestDto;
 import com.example.b11ndboard.commentlike.dto.CommentResponseDto;
 import com.example.b11ndboard.commentlike.repository.CommentLikeRepository;
+import com.example.b11ndboard.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,13 +21,14 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final PostRepository PostRepository;
     //private final BoardRepository boardRepository; 게시글 확인용
 
     //댓 등록
 
     @Transactional
     public Long saveComment(Long boardId , CommentRequestDto dto){
-        Post post = PostRepository.findbyId(boardId)
+        Post post = PostRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 개시글은 존재하지 않습니다"));
 
         Comment comment = Comment.builder()
@@ -35,6 +37,34 @@ public class CommentService {
                 .post(post)
                 .build();
         return commentRepository.save(comment).getId();
+    }
+
+    @Transactional
+    public void updateComment(Long commentId, String currentWriter, String newContent) {
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+
+        if (!java.util.Objects.equals(comment.getWriter(), currentWriter)) {
+            throw new IllegalArgumentException("본인이 작성한 댓글만 수정할 수 있습니다.");
+        }
+
+        // 댓글 수정 실행 (JPA 변경 감지 작동)
+        comment.updateContent(newContent);
+    }
+
+    @Transactional
+    public void deleteComment(Long commentId, String currentWriter) {
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+
+        if (!java.util.Objects.equals(comment.getWriter(), currentWriter)) {
+            throw new IllegalArgumentException("본인이 작성한 댓글만 삭제할 수 있습니다.");
+        }
+
+        // DB에서 삭제
+        commentRepository.delete(comment);
     }
 
     public List<CommentResponseDto> getComments(Long boardId){
