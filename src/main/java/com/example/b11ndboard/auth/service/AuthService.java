@@ -9,7 +9,10 @@ import com.example.b11ndboard.global.exception.LoginException;
 import com.example.b11ndboard.auth.repository.UsersRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -60,8 +63,13 @@ public class AuthService {
         Users users = usersRepository.findByUsername(username)
                 .orElseThrow(() -> new LoginException(LOGIN_FAILED));
 
-        tokenService.generateAccessToken(users.getUsername(), users.getRole(), response);
+        tokenService.generateTokens(users.getUsername(), users.getRole(), response);
 
         return ApiResponse.ok("토큰 재발급 성공", ResponseKind.LOGIN, null);
+    }
+
+    public ApiResponse<Void> logout(Long userId, HttpServletResponse response) {
+        tokenService.deleteTokens(userId, response);
+        return ApiResponse.ok("로그아웃 성공", ResponseKind.LOGOUT, null);
     }
 }
