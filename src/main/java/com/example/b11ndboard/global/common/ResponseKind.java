@@ -5,5 +5,6 @@ public enum ResponseKind {
     OAUTH_SIGNUP,
     LOGIN,
     OAUTH_LOGIN,
-    VALIDATION_ERROR
+    VALIDATION_ERROR,
+    LOGOUT
 }

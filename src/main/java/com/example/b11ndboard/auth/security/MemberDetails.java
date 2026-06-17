@@ -30,7 +30,7 @@ public class MemberDetails implements UserDetails {
     }
 
     public Long getUserId(){
-        return users.getUserId();
+        return users.getId();
     }
 
 

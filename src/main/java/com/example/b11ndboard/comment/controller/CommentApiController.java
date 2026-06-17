@@ -33,8 +33,8 @@ public class CommentApiController {
         return ResponseEntity.ok(comments);
     }
 
-    // 💡 컨트롤러 수정 예시
-    @PutMapping("/comments/{commentId}")
+    //컨트롤러 수정 예시
+    @PutMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<String> updateComment(
             @PathVariable Long commentId,
             @RequestBody CommentRequest requestDto,
@@ -46,7 +46,7 @@ public class CommentApiController {
         return ResponseEntity.ok("댓글 수정되었습니다");
     }
 
-    @DeleteMapping("/comments/{commentId}")
+    @DeleteMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<String> deleteComment(
             @PathVariable Long commentId,
             @AuthenticationPrincipal MemberDetails memberDetails
