@@ -28,7 +28,7 @@ public class CommentLikeService {
         //이미 존재하는 댓글&유저 검증
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 댓글은 존재하지 않습니다"));
-        Users user = usersRepository.findById(commentId)
+        Users user = usersRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원은 존재하지 않습니다"));
 
         Optional<CommentLike> alreadyLike = commentLikeRepository.findByUserIdAndCommentId(userId,commentId);
