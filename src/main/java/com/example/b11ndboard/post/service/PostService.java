@@ -1,5 +1,6 @@
 package com.example.b11ndboard.post.service;
 
+import com.example.b11ndboard.auth.entity.Users;
 import com.example.b11ndboard.post.dto.PostRequestDto;
 import com.example.b11ndboard.post.dto.PostResponseDto;
 import com.example.b11ndboard.post.entity.Post;
@@ -138,5 +139,19 @@ public class PostService {
 
         // 5. 확장된 DTO 생성자를 통해 최종 결과 반환
         return new PostResponseDto(post, likeCount, liked, commentCount);
+    }
+    // 7. 게시글 좋아요 취소 로직
+    @Transactional
+    public void cancelPostLike(Long postId, Long userId) {
+        // 1. 게시글 존재 여부 확인
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
+
+        // 2. 해당 유저가 이 게시글에 누른 좋아요가 있는지 확인 (기존 Users -> Long userId 기반 조회로 변경)
+        PostLike postLike = postLikeRepository.findByUserIdAndPost(userId, post)
+                .orElseThrow(() -> new PostException(ErrorCode.LIKE_NOT_FOUND));
+
+        // 3. 좋아요 삭제
+        postLikeRepository.delete(postLike);
     }
 }

@@ -86,4 +86,16 @@ public class PostController {
         postService.likePost(postId, memberDetails.getUserId());
         return ResponseEntity.ok(ApiResponse.ok("좋아요 반영", ResponseKind.VALIDATION_ERROR, null));
     }
+    // 7. 게시글 좋아요 취소 api
+    @DeleteMapping("/{postId}/likes") // 주소 경로(/{postId}/likes)를 추가했습니다.
+    public ResponseEntity<ApiResponse<Void>> cancelLike(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal MemberDetails memberDetails) {
+
+        // 파라미터를 Long 타입(getUserId())으로 맞춰 에러를 해결합니다.
+        postService.cancelPostLike(postId, memberDetails.getUserId());
+
+        // 기존의 일관된 API 응답 규격(ApiResponse) 형태로 반환합니다.
+        return ResponseEntity.ok(ApiResponse.ok("좋아요가 취소되었습니다.", ResponseKind.VALIDATION_ERROR, null));
+    }
 }

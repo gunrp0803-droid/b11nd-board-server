@@ -19,7 +19,8 @@ public enum ErrorCode {
     // Post
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."),
     NOT_POST_AUTHOR(HttpStatus.FORBIDDEN, "게시글의 작성자가 아닙니다."),
-    ALREADY_LIKED(HttpStatus.BAD_REQUEST, "이미 좋아요를 누른 게시글입니다.");
+    ALREADY_LIKED(HttpStatus.BAD_REQUEST, "이미 좋아요를 누른 게시글입니다."),
+    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요가 없습니다.");
 
     @Getter
     private final HttpStatus status;
