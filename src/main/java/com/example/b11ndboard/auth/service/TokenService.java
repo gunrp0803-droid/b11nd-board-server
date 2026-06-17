@@ -3,6 +3,7 @@ package com.example.b11ndboard.auth.service;
 import com.example.b11ndboard.auth.entity.Role;
 import com.example.b11ndboard.auth.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -21,14 +22,14 @@ public class TokenService {
 
         ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
                 .path("/")
-                .httpOnly(false)
+                .httpOnly(true)
                 .maxAge(Duration.ofMillis(jwtProvider.getAccessExpiration()))
                 .sameSite("Lax")
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .path("/")
-                .httpOnly(false)
+                .httpOnly(true)
                 .maxAge(Duration.ofMillis(jwtProvider.getRefreshExpiration()))
                 .sameSite("Lax")
                 .build();
@@ -37,16 +38,21 @@ public class TokenService {
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
     }
 
-    public void generateAccessToken(String username, Role role, HttpServletResponse response) {
-        String accessToken = jwtProvider.generateAccessToken(username, role);
+    @Transactional
+    public void deleteTokens(Long userId, HttpServletResponse response) {
 
-        ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken)
+        ResponseCookie expiredAccessCookie = ResponseCookie.from("accessToken", "")
                 .path("/")
-                .httpOnly(false)
-                .maxAge(Duration.ofMillis(jwtProvider.getAccessExpiration()))
-                .sameSite("Lax")
+                .maxAge(0)
+                .httpOnly(true)
+                .build();
+        ResponseCookie expiredRefreshCookie = ResponseCookie.from("refreshToken", "")
+                .path("/")
+                .maxAge(0)
+                .httpOnly(true)
                 .build();
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, expiredAccessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, expiredRefreshCookie.toString());
     }
 }

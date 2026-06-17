@@ -27,10 +27,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/signup", "/refresh").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/**").permitAll()
-                        .requestMatchers("/api/**").authenticated()
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/login", "/auth/signup", "/auth/refresh").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         ;
