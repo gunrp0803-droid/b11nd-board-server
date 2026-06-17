@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/posts")
+@RequestMapping("/api/posts")
 @RequiredArgsConstructor
 public class CommentApiController {
     private final CommentService commentService;
@@ -21,8 +21,9 @@ public class CommentApiController {
     //댓글 api
     @PostMapping("/{postId}/comments")
     public ResponseEntity<String> createComment(@PathVariable Long postId,
+                                                @AuthenticationPrincipal MemberDetails memberDetails,
                                                 @RequestBody CommentRequestDto dto) {
-        commentService.saveComment(postId, dto);
+        commentService.saveComment(postId, dto, memberDetails.getUserId());
         return ResponseEntity.ok("댓글이 등록 되었습니다");
     }
 

@@ -21,20 +21,20 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
-    private final PostRepository PostRepository;
-    //private final BoardRepository boardRepository; 게시글 확인용
+    private final PostRepository postRepository;
 
     //댓 등록
 
     @Transactional
-    public Long saveComment(Long boardId , CommentRequestDto dto){
-        Post post = PostRepository.findById(boardId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 개시글은 존재하지 않습니다"));
+    public Long saveComment(Long boardId , CommentRequestDto dto, Long userId){
+        Post post = postRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글은 존재하지 않습니다"));
 
         Comment comment = Comment.builder()
                 .content(dto.getContent())
                 .writer(dto.getWriter())
                 .post(post)
+                .userId(userId)
                 .build();
         return commentRepository.save(comment).getId();
     }

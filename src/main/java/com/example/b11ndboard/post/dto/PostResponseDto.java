@@ -15,6 +15,7 @@ public class PostResponseDto {
 
     private long likeCount;     // 이 글의 총 좋아요 개수
     private boolean liked;      // 현재 로그인한 사용자가 좋아요를 눌렀는지 여부
+    private long commentCount;  // 이 글의 총 댓글 개수
 
     // 기존 단건 엔티티 변환용 생성자 (기본값 설정)
     public PostResponseDto(Post post) {
@@ -26,9 +27,10 @@ public class PostResponseDto {
         this.updatedAt = post.getUpdatedAt();
         this.likeCount = 0;
         this.liked = false;
+        this.commentCount = 0;
     }
 
-    public PostResponseDto(Post post, long likeCount, boolean liked) {
+    public PostResponseDto(Post post, long likeCount, boolean liked, long commentCount) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
@@ -37,5 +39,6 @@ public class PostResponseDto {
         this.updatedAt = post.getUpdatedAt();
         this.likeCount = likeCount;
         this.liked = liked;
+        this.commentCount = commentCount;
     }
 }

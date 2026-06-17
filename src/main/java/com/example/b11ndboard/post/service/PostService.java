@@ -8,6 +8,7 @@ import com.example.b11ndboard.global.exception.ErrorCode;
 import com.example.b11ndboard.post.exception.PostException;
 import com.example.b11ndboard.post.repository.PostLikeRepository;
 import com.example.b11ndboard.post.repository.PostRepository;
+import com.example.b11ndboard.comment.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
+    private final CommentRepository commentRepository;
 
     // 1. 게시글 생성
     @Transactional
@@ -43,7 +45,11 @@ public class PostService {
     // 2. 전체 게시글 목록 조회
     public List<PostResponseDto> getAllPosts() {
         return postRepository.findAll().stream()
-                .map(PostResponseDto::new)
+                .map(post -> {
+                    long likeCount = postLikeRepository.countByPost(post);
+                    long commentCount = commentRepository.countByPostId(post.getId());
+                    return new PostResponseDto(post, likeCount, false, commentCount);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -51,7 +57,9 @@ public class PostService {
     public PostResponseDto getPost(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
-        return new PostResponseDto(post);
+        long likeCount = postLikeRepository.countByPost(post);
+        long commentCount = commentRepository.countByPostId(postId);
+        return new PostResponseDto(post, likeCount, false, commentCount);
     }
 
     // 4. 게시글 수정
@@ -66,7 +74,10 @@ public class PostService {
         }
 
         post.update(requestDto.getTitle(), requestDto.getContent());
-        return new PostResponseDto(post);
+        long likeCount = postLikeRepository.countByPost(post);
+        boolean liked = postLikeRepository.existsByUserIdAndPost(userId, post);
+        long commentCount = commentRepository.countByPostId(postId);
+        return new PostResponseDto(post, likeCount, liked, commentCount);
     }
 
     // 5. 게시글 삭제
@@ -105,7 +116,11 @@ public class PostService {
 
         Page<Post> postPage = postRepository.findAll(pageable);
 
-        return postPage.map(PostResponseDto::new);
+        return postPage.map(post -> {
+            long likeCount = postLikeRepository.countByPost(post);
+            long commentCount = commentRepository.countByPostId(post.getId());
+            return new PostResponseDto(post, likeCount, false, commentCount);
+        });
     }
     public PostResponseDto getPost(Long postId, Long userId) {
         // 1. 게시글이 존재하는지 확인
@@ -118,7 +133,10 @@ public class PostService {
         // 3. 현재 로그인한 유저가 이 글에 좋아요를 눌렀는지 여부 가져오기
         boolean liked = postLikeRepository.existsByUserIdAndPost(userId, post);
 
-        // 4. 확장된 DTO 생성자를 통해 최종 결과 반환
-        return new PostResponseDto(post, likeCount, liked);
+        // 4. 댓글 개수 가져오기
+        long commentCount = commentRepository.countByPostId(postId);
+
+        // 5. 확장된 DTO 생성자를 통해 최종 결과 반환
+        return new PostResponseDto(post, likeCount, liked, commentCount);
     }
 }
