@@ -10,12 +10,14 @@ public class CommentResponse {
     private String content;
     private String writer;
     private String createdAt;
+    private long likeCount;
 
-    public CommentResponse(Comment comment){
+    public CommentResponse(Comment comment,Long likeCount){
         this.id = comment.getId();
         this.content = comment.getContent();
         this.writer = comment.getWriter();
         this.createdAt = comment.getCreatedAt().toString();
+        this.likeCount = likeCount;
 
     }
 }

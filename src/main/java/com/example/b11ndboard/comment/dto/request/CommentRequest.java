@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class CommentRequest {
-    private String Content;
-    private String Writer;
+    private String content;
+    private String writer;
 }
 
