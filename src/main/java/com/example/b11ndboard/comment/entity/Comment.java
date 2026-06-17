@@ -20,7 +20,7 @@ public class Comment {
     private String content;
 
     //여러 댓글이 하나의 게시글에 속함
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id",nullable = false)
     private Post post;
 
@@ -29,11 +29,17 @@ public class Comment {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Builder
-    public Comment(String content , Board board , String writer){
+    public Comment(String content , Post post , String writer){
         this.content = content;
-        this.board = board;
+        this.post = post;
         this.writer = writer;
     }
 
+    public void updateContent(String newContent) {
+        if (newContent == null || newContent.trim().isEmpty()) {
+            throw new IllegalArgumentException("댓글 내용은 비어있을 수 없습니다.");
+        }
+        this.content = newContent;
+    }
 
 }
