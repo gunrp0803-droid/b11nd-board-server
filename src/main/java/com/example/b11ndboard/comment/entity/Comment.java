@@ -21,18 +21,23 @@ public class Comment {
 
     //여러 댓글이 하나의 게시글에 속함
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id",nullable = false)
+    @JoinColumn(name = "post_id",nullable = false)
     private Post post;
 
+    @Column(nullable = false)
     private String writer;
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Builder
-    public Comment(String content , Post post , String writer){
+    public Comment(String content, Post post, String writer, Long userId) {
         this.content = content;
         this.post = post;
         this.writer = writer;
+        this.userId = userId;
     }
 
     public void updateContent(String newContent) {
