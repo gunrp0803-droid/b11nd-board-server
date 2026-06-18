@@ -21,7 +21,7 @@ public class Comment {
 
     //여러 댓글이 하나의 게시글에 속함
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id",nullable = false)
+    @JoinColumn(name = "post_id",nullable = false)
     private Post post;
 
     @Column(nullable = false)

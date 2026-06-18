@@ -7,6 +7,8 @@ import com.example.b11ndboard.comment.entity.Comment;
 import com.example.b11ndboard.comment.repository.CommentRepository;
 import com.example.b11ndboard.commentlike.entity.CommentLike;
 import com.example.b11ndboard.commentlike.repository.CommentLikeRepository;
+import com.example.b11ndboard.global.exception.ErrorCode;
+import com.example.b11ndboard.post.exception.PostException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +29,9 @@ public class CommentLikeService {
 
         //이미 존재하는 댓글&유저 검증
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 댓글은 존재하지 않습니다"));
+                .orElseThrow(() -> new PostException(ErrorCode.COMMENT_NOT_FOUND));
         Users user = usersRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 회원은 존재하지 않습니다"));
+                .orElseThrow(() -> new PostException(ErrorCode.LOGIN_FAILED));
 
         Optional<CommentLike> alreadyLike = commentLikeRepository.findByUserIdAndCommentId(userId,commentId);
 
