@@ -71,7 +71,7 @@ public class PostService {
 
         // 작성자 검증
         if (!post.getUserId().equals(userId)) {
-            throw new PostException(ErrorCode.NOT_POST_AUTHOR);
+            throw new PostException(ErrorCode.POST_UPDATE_FORBIDDEN);
         }
 
         post.update(requestDto.getTitle(), requestDto.getContent());
@@ -89,7 +89,7 @@ public class PostService {
 
         // 작성자 검증
         if (!post.getUserId().equals(userId)) {
-            throw new PostException(ErrorCode.NOT_POST_AUTHOR);
+            throw new PostException(ErrorCode.POST_DELETE_FORBIDDEN);
         }
 
         postRepository.delete(post);
@@ -132,7 +132,7 @@ public class PostService {
         long likeCount = postLikeRepository.countByPost(post);
 
         // 3. 현재 로그인한 유저가 이 글에 좋아요를 눌렀는지 여부 가져오기
-        boolean liked = postLikeRepository.existsByUserIdAndPost(userId, post);
+        boolean liked = (userId != null) && postLikeRepository.existsByUserIdAndPost(userId, post);
 
         // 4. 댓글 개수 가져오기
         long commentCount = commentRepository.countByPostId(postId);
