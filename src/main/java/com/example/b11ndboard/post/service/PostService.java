@@ -1,6 +1,7 @@
 package com.example.b11ndboard.post.service;
 
 import com.example.b11ndboard.auth.entity.Users;
+import com.example.b11ndboard.auth.repository.UsersRepository;
 import com.example.b11ndboard.post.dto.PostRequestDto;
 import com.example.b11ndboard.post.dto.PostResponseDto;
 import com.example.b11ndboard.post.entity.Post;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +31,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
     private final CommentRepository commentRepository;
+    private final UsersRepository usersRepository;
 
     // 1. 게시글 생성
     @Transactional
@@ -40,16 +43,29 @@ public class PostService {
                 .build();
 
         Post savedPost = postRepository.save(post);
-        return new PostResponseDto(savedPost);
+        String username = usersRepository.findById(userId)
+                .map(Users::getUsername)
+                .orElse("알 수 없음");
+        return new PostResponseDto(savedPost, username);
     }
 
     // 2. 전체 게시글 목록 조회
     public List<PostResponseDto> getAllPosts() {
-        return postRepository.findAll().stream()
+        List<Post> posts = postRepository.findAll();
+        List<Long> userIds = posts.stream()
+                .map(Post::getUserId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        Map<Long, String> userIdToUsernameMap = usersRepository.findAllById(userIds).stream()
+                .collect(Collectors.toMap(Users::getId, Users::getUsername));
+
+        return posts.stream()
                 .map(post -> {
                     long likeCount = postLikeRepository.countByPost(post);
                     long commentCount = commentRepository.countByPostId(post.getId());
-                    return new PostResponseDto(post, likeCount, false, commentCount);
+                    String username = userIdToUsernameMap.getOrDefault(post.getUserId(), "알 수 없음");
+                    return new PostResponseDto(post, username, likeCount, false, commentCount);
                 })
                 .collect(Collectors.toList());
     }
@@ -60,7 +76,10 @@ public class PostService {
                 .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
         long likeCount = postLikeRepository.countByPost(post);
         long commentCount = commentRepository.countByPostId(postId);
-        return new PostResponseDto(post, likeCount, false, commentCount);
+        String username = usersRepository.findById(post.getUserId())
+                .map(Users::getUsername)
+                .orElse("알 수 없음");
+        return new PostResponseDto(post, username, likeCount, false, commentCount);
     }
 
     // 4. 게시글 수정
@@ -78,7 +97,10 @@ public class PostService {
         long likeCount = postLikeRepository.countByPost(post);
         boolean liked = postLikeRepository.existsByUserIdAndPost(userId, post);
         long commentCount = commentRepository.countByPostId(postId);
-        return new PostResponseDto(post, likeCount, liked, commentCount);
+        String username = usersRepository.findById(post.getUserId())
+                .map(Users::getUsername)
+                .orElse("알 수 없음");
+        return new PostResponseDto(post, username, likeCount, liked, commentCount);
     }
 
     // 5. 게시글 삭제
@@ -117,10 +139,19 @@ public class PostService {
 
         Page<Post> postPage = postRepository.findAll(pageable);
 
+        List<Long> userIds = postPage.getContent().stream()
+                .map(Post::getUserId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        Map<Long, String> userIdToUsernameMap = usersRepository.findAllById(userIds).stream()
+                .collect(Collectors.toMap(Users::getId, Users::getUsername));
+
         return postPage.map(post -> {
             long likeCount = postLikeRepository.countByPost(post);
             long commentCount = commentRepository.countByPostId(post.getId());
-            return new PostResponseDto(post, likeCount, false, commentCount);
+            String username = userIdToUsernameMap.getOrDefault(post.getUserId(), "알 수 없음");
+            return new PostResponseDto(post, username, likeCount, false, commentCount);
         });
     }
     public PostResponseDto getPost(Long postId, Long userId) {
@@ -137,8 +168,13 @@ public class PostService {
         // 4. 댓글 개수 가져오기
         long commentCount = commentRepository.countByPostId(postId);
 
-        // 5. 확장된 DTO 생성자를 통해 최종 결과 반환
-        return new PostResponseDto(post, likeCount, liked, commentCount);
+        // 5. 작성자 이름 가져오기
+        String username = usersRepository.findById(post.getUserId())
+                .map(Users::getUsername)
+                .orElse("알 수 없음");
+
+        // 6. 확장된 DTO 생성자를 통해 최종 결과 반환
+        return new PostResponseDto(post, username, likeCount, liked, commentCount);
     }
     // 7. 게시글 좋아요 취소 로직
     @Transactional

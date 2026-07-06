@@ -10,6 +10,7 @@ public class PostResponseDto {
     private String title;
     private String content;
     private Long userId;
+    private String username;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -18,11 +19,12 @@ public class PostResponseDto {
     private long commentCount;  // 이 글의 총 댓글 개수
 
     // 기존 단건 엔티티 변환용 생성자 (기본값 설정)
-    public PostResponseDto(Post post) {
+    public PostResponseDto(Post post, String username) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.userId = post.getUserId();
+        this.username = username;
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
         this.likeCount = 0;
@@ -30,11 +32,12 @@ public class PostResponseDto {
         this.commentCount = 0;
     }
 
-    public PostResponseDto(Post post, long likeCount, boolean liked, long commentCount) {
+    public PostResponseDto(Post post, String username, long likeCount, boolean liked, long commentCount) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.userId = post.getUserId();
+        this.username = username;
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
         this.likeCount = likeCount;
