@@ -35,7 +35,8 @@ public class SecurityConfig {
                 .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/signup", "/auth/refresh", "/api/v1/posts", "/api/v1/posts/{postId}", "/api/v1/posts/{postId}/comments").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/v1/posts/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         ;
