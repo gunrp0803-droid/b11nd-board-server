@@ -24,14 +24,16 @@ public class TokenService {
                 .path("/")
                 .httpOnly(true)
                 .maxAge(Duration.ofMillis(jwtProvider.getAccessExpiration()))
-                .sameSite("Lax")
+                .secure(true)
+                .sameSite("None")
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .path("/")
                 .httpOnly(true)
                 .maxAge(Duration.ofMillis(jwtProvider.getRefreshExpiration()))
-                .sameSite("Lax")
+                .secure(true)
+                .sameSite("None")
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
@@ -45,11 +47,15 @@ public class TokenService {
                 .path("/")
                 .maxAge(0)
                 .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
                 .build();
         ResponseCookie expiredRefreshCookie = ResponseCookie.from("refreshToken", "")
                 .path("/")
                 .maxAge(0)
                 .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, expiredAccessCookie.toString());
