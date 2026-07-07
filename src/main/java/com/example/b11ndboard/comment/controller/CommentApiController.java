@@ -39,8 +39,12 @@ public class CommentApiController {
 
     // 2. 댓글 목록 조회 API
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<ApiResponse<List<CommentResponseDto>>> getCommentList(@PathVariable Long postId) {
-        List<CommentResponseDto> comments = commentService.getComments(postId);
+    public ResponseEntity<ApiResponse<List<CommentResponseDto>>> getCommentList(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal MemberDetails memberDetails
+    ) {
+        Long userId = (memberDetails != null) ? memberDetails.getUserId() : null;
+        List<CommentResponseDto> comments = commentService.getComments(postId, userId);
         return ResponseEntity.ok(ApiResponse.ok("댓글 목록 조회 성공", ResponseKind.COMMENT_GET_ALL, comments));
     }
 
