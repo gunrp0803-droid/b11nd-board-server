@@ -70,12 +70,17 @@ public class CommentService {
 
     // 4. 댓글 목록 조회
     public List<CommentResponseDto> getComments(Long postId) {
+        return getComments(postId, null);
+    }
+
+    public List<CommentResponseDto> getComments(Long postId, Long userId) {
         List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
 
         return comments.stream()
                 .map(comment -> {
                     long likeCount = commentLikeRepository.countByCommentId(comment.getId());
-                    return new CommentResponseDto(comment, likeCount);
+                    boolean isWriter = (userId != null) && comment.getUserId().equals(userId);
+                    return new CommentResponseDto(comment, likeCount, isWriter);
                 })
                 .collect(Collectors.toList());
     }
