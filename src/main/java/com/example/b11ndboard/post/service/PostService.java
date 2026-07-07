@@ -65,7 +65,7 @@ public class PostService {
                     long likeCount = postLikeRepository.countByPost(post);
                     long commentCount = commentRepository.countByPostId(post.getId());
                     String username = userIdToUsernameMap.getOrDefault(post.getUserId(), "알 수 없음");
-                    return new PostResponseDto(post, username, likeCount, false, commentCount);
+                    return new PostResponseDto(post, username, likeCount, false, commentCount, false);
                 })
                 .collect(Collectors.toList());
     }
@@ -79,7 +79,7 @@ public class PostService {
         String username = usersRepository.findById(post.getUserId())
                 .map(Users::getUsername)
                 .orElse("알 수 없음");
-        return new PostResponseDto(post, username, likeCount, false, commentCount);
+        return new PostResponseDto(post, username, likeCount, false, commentCount, false);
     }
 
     // 4. 게시글 수정
@@ -100,7 +100,7 @@ public class PostService {
         String username = usersRepository.findById(post.getUserId())
                 .map(Users::getUsername)
                 .orElse("알 수 없음");
-        return new PostResponseDto(post, username, likeCount, liked, commentCount);
+        return new PostResponseDto(post, username, likeCount, liked, commentCount, true);
     }
 
     // 5. 게시글 삭제
@@ -135,6 +135,10 @@ public class PostService {
         postLikeRepository.save(postLike);
     }
     public Page<PostResponseDto> getAllPosts(int page){
+        return getAllPosts(page, null);
+    }
+
+    public Page<PostResponseDto> getAllPosts(int page, Long userId){
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Page<Post> postPage = postRepository.findAll(pageable);
@@ -150,8 +154,10 @@ public class PostService {
         return postPage.map(post -> {
             long likeCount = postLikeRepository.countByPost(post);
             long commentCount = commentRepository.countByPostId(post.getId());
+            boolean liked = (userId != null) && postLikeRepository.existsByUserIdAndPost(userId, post);
+            boolean isWriter = (userId != null) && post.getUserId().equals(userId);
             String username = userIdToUsernameMap.getOrDefault(post.getUserId(), "알 수 없음");
-            return new PostResponseDto(post, username, likeCount, false, commentCount);
+            return new PostResponseDto(post, username, likeCount, liked, commentCount, isWriter);
         });
     }
     public PostResponseDto getPost(Long postId, Long userId) {
@@ -173,8 +179,11 @@ public class PostService {
                 .map(Users::getUsername)
                 .orElse("알 수 없음");
 
-        // 6. 확장된 DTO 생성자를 통해 최종 결과 반환
-        return new PostResponseDto(post, username, likeCount, liked, commentCount);
+        // 6. 작성자 판별
+        boolean isWriter = (userId != null) && post.getUserId().equals(userId);
+
+        // 7. 확장된 DTO 생성자를 통해 최종 결과 반환
+        return new PostResponseDto(post, username, likeCount, liked, commentCount, isWriter);
     }
     // 7. 게시글 좋아요 취소 로직
     @Transactional

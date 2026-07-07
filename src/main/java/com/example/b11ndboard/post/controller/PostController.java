@@ -34,9 +34,11 @@ public class PostController {
     // 2. 전체 게시글 목록 조회 API (R) - 페이징 처리 반영 완료
     @GetMapping
     public ResponseEntity<ApiResponse<Page<PostResponseDto>>> getAllPosts(
-            @RequestParam(value = "page", defaultValue = "0") int page
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @AuthenticationPrincipal MemberDetails memberDetails
     ) {
-        Page<PostResponseDto> response = postService.getAllPosts(page);
+        Long userId = (memberDetails != null) ? memberDetails.getUserId() : null;
+        Page<PostResponseDto> response = postService.getAllPosts(page, userId);
         return ResponseEntity.ok(
                 ApiResponse.ok("전체 게시글 목록 조회 (페이지: " + page + ")", ResponseKind.POST_GET_ALL, response)
         );
@@ -53,6 +55,7 @@ public class PostController {
         return ResponseEntity.ok(
                 ApiResponse.ok("게시글 상세 조회", ResponseKind.POST_GET_DETAIL, response)
         );
+
     }
 
     // 4. 게시글 수정 API (U)
