@@ -19,7 +19,7 @@ spring:
 
 app:
   jwt:
-    secret: ${JWT-SECRET}
+    secret: ${JWT_SECRET}
     access-expiration: ${JWT_ACCESS_EXPIRATION}
     refresh-expiration: ${JWT_REFRESH_EXPIRATION}
   cookie:
