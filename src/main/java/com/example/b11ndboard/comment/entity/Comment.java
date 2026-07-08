@@ -1,5 +1,6 @@
 package com.example.b11ndboard.comment.entity;
 
+import com.example.b11ndboard.commentlike.entity.CommentLike;
 import com.example.b11ndboard.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -7,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -31,6 +34,9 @@ public class Comment {
     private Long userId;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<CommentLike> commentLike = new ArrayList<>();
 
     @Builder
     public Comment(String content, Post post, String writer, Long userId) {

@@ -1,11 +1,16 @@
 package com.example.b11ndboard.post.entity;
 
+import com.example.b11ndboard.comment.entity.Comment;
+import com.example.b11ndboard.commentlike.entity.CommentLike;
 import com.example.b11ndboard.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -25,6 +30,12 @@ public class Post extends BaseTimeEntity{
     //JWT 완성하기 전까지는 임시로 숫자를 넣거나 static하게 검증할 작성자 ID
     @Column(nullable = false)
     private Long userId;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> comment = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<PostLike> postLike = new ArrayList<>();
 
     @Builder
     public Post(String title, String content, Long userId) {
