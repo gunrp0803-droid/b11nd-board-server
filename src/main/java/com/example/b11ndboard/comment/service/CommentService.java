@@ -80,7 +80,8 @@ public class CommentService {
                 .map(comment -> {
                     long likeCount = commentLikeRepository.countByCommentId(comment.getId());
                     boolean isWriter = (userId != null) && comment.getUserId().equals(userId);
-                    return new CommentResponseDto(comment, likeCount, isWriter);
+                    boolean liked = (userId != null) && commentLikeRepository.existsByUserIdAndCommentId(userId, comment.getId());
+                    return new CommentResponseDto(comment, likeCount, isWriter, liked);
                 })
                 .collect(Collectors.toList());
     }
