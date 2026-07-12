@@ -1,0 +1,50 @@
+package com.example.b11ndboard.domain.post.dto.response;
+
+import com.example.b11ndboard.domain.post.entity.Post;
+import lombok.Getter;
+import java.time.LocalDateTime;
+
+@Getter
+public class PostResponseDto {
+    private Long id;
+    private String title;
+    private String content;
+    private Long userId;
+    private String username;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    private long likeCount;     // 이 글의 총 좋아요 개수
+    private boolean liked;      // 현재 로그인한 사용자가 좋아요를 눌렀는지 여부
+    private long commentCount;  // 이 글의 총 댓글 개수
+    private Boolean isWriter;   // 현재 로그인한 사용자가 이 글의 작성자인지 여부
+
+    // 기존 단건 엔티티 변환용 생성자 (기본값 설정)
+    public PostResponseDto(Post post, String username) {
+        this.id = post.getId();
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.userId = post.getUserId();
+        this.username = username;
+        this.createdAt = post.getCreatedAt();
+        this.updatedAt = post.getUpdatedAt();
+        this.likeCount = 0;
+        this.liked = false;
+        this.commentCount = 0;
+        this.isWriter = true;
+    }
+
+    public PostResponseDto(Post post, String username, long likeCount, boolean liked, long commentCount, boolean isWriter) {
+        this.id = post.getId();
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.userId = post.getUserId();
+        this.username = username;
+        this.createdAt = post.getCreatedAt();
+        this.updatedAt = post.getUpdatedAt();
+        this.likeCount = likeCount;
+        this.liked = liked;
+        this.commentCount = commentCount;
+        this.isWriter = isWriter;
+    }
+}
