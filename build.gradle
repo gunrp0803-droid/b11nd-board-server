@@ -14,6 +14,10 @@ java {
     }
 }
 
+springBoot {
+    mainClass = 'com.example.b11ndboard.Application'
+}
+
 repositories {
     mavenCentral()
 }
@@ -56,4 +60,29 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+    if (file(".env").exists()) {
+        file(".env").readLines().each {
+            def line = it.trim()
+            if (line && !line.startsWith("#")) {
+                def parts = line.split("=", 2)
+                if (parts.length == 2) {
+                    environment parts[0].trim(), parts[1].trim()
+                }
+            }
+        }
+    }
+}
+
+bootRun {
+    if (file(".env").exists()) {
+        file(".env").readLines().each {
+            def line = it.trim()
+            if (line && !line.startsWith("#")) {
+                def parts = line.split("=", 2)
+                if (parts.length == 2) {
+                    environment parts[0].trim(), parts[1].trim()
+                }
+            }
+        }
+    }
 }
