@@ -18,55 +18,47 @@ import java.util.List;
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 public class CommentApiController {
+
     private final CommentService commentService;
     private final CommentLikeService commentLikeService;
 
-    // 1. 댓글 작성 API
     @PostMapping("/{postId}/comments")
     public ResponseEntity<ApiResponse<Void>> createComment(
             @PathVariable Long postId,
             @AuthenticationPrincipal MemberDetails memberDetails,
             @RequestBody CommentRequestDto dto) {
-
         commentService.saveComment(postId, dto, memberDetails.getUserId(), memberDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.ok("댓글이 등록되었습니다.", ResponseKind.COMMENT_CREATE));
     }
 
-    // 2. 댓글 목록 조회 API
     @GetMapping("/{postId}/comments")
     public ResponseEntity<ApiResponse<List<CommentResponseDto>>> getCommentList(
             @PathVariable Long postId,
-            @AuthenticationPrincipal MemberDetails memberDetails
-    ) {
-        Long userId = (memberDetails != null) ? memberDetails.getUserId() : null;
-        List<CommentResponseDto> comments = commentService.getComments(postId, userId);
+            @AuthenticationPrincipal MemberDetails memberDetails) {
+        List<CommentResponseDto> comments = commentService.getComments(postId, memberDetails != null ? memberDetails.getUserId() : null);
         return ResponseEntity.ok(ApiResponse.ok("댓글 목록 조회 성공", ResponseKind.COMMENT_GET_ALL, comments));
     }
 
-    // 3. 댓글 수정 API
     @PutMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<ApiResponse<Void>> updateComment(
             @PathVariable Long postId,
             @PathVariable Long commentId,
             @RequestBody CommentRequestDto requestDto,
-            @AuthenticationPrincipal MemberDetails memberDetails
-    ) {
+            @AuthenticationPrincipal MemberDetails memberDetails) {
         commentService.updateComment(commentId, memberDetails.getUserId(), requestDto.getContent());
         return ResponseEntity.ok(ApiResponse.ok("댓글이 수정되었습니다.", ResponseKind.COMMENT_UPDATE));
     }
 
-    // 4. 댓글 삭제 API
     @DeleteMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<ApiResponse<Void>> deleteComment(
             @PathVariable Long postId,
             @PathVariable Long commentId,
-            @AuthenticationPrincipal MemberDetails memberDetails
-    ) {
+            @AuthenticationPrincipal MemberDetails memberDetails) {
         commentService.deleteComment(commentId, memberDetails.getUserId());
         return ResponseEntity.ok(ApiResponse.ok("댓글이 삭제되었습니다.", ResponseKind.COMMENT_DELETE));
     }
 
-    // 5. 댓글 좋아요 toggle API
+    // 수정: Like 서비스 직접 호출 및 ResponseKind 변경
     @PostMapping("/comments/{commentId}/likes")
     public ResponseEntity<ApiResponse<Void>> toggleLike(
             @PathVariable Long commentId,
@@ -74,6 +66,7 @@ public class CommentApiController {
 
         boolean isLiked = commentLikeService.toggleCommentLike(commentId, memberDetails.getUserId());
         String message = isLiked ? "좋아요를 눌렀습니다." : "좋아요를 취소했습니다.";
+
         return ResponseEntity.ok(ApiResponse.ok(message, ResponseKind.COMMENT_LIKE));
     }
 }
