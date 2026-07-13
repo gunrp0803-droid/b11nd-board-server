@@ -23,5 +23,6 @@ public enum ResponseKind {
     COMMENT_GET_ALL,
     COMMENT_UPDATE,
     COMMENT_DELETE,
+    COMMENT_LIKE,
     COMMENT_ERROR
 }

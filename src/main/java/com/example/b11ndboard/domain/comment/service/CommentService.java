@@ -24,7 +24,6 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
     private final PostRepository postRepository;
-    private final CommentLikeService commentLikeService;
 
     // 1. 댓글 등록
     @Transactional
@@ -38,16 +37,17 @@ public class CommentService {
                 .post(post)
                 .userId(userId)
                 .build();
+
         return commentRepository.save(comment).getId();
     }
 
     // 2. 댓글 수정
     @Transactional
-    public void updateComment(Long commentId, String currentWriter, String newContent) {
+    public void updateComment(Long commentId, Long userId, String newContent) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new PostException(ErrorCode.COMMENT_NOT_FOUND));
 
-        if (!java.util.Objects.equals(comment.getWriter(), currentWriter)) {
+        if (!java.util.Objects.equals(comment.getUserId(), userId)) {
             throw new PostException(ErrorCode.COMMENT_UPDATE_FORBIDDEN);
         }
 
@@ -56,11 +56,11 @@ public class CommentService {
 
     // 3. 댓글 삭제
     @Transactional
-    public void deleteComment(Long commentId, String currentWriter) {
+    public void deleteComment(Long commentId, Long userId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new PostException(ErrorCode.COMMENT_NOT_FOUND));
 
-        if (!java.util.Objects.equals(comment.getWriter(), currentWriter)) {
+        if (!java.util.Objects.equals(comment.getUserId(), userId)) {
             throw new PostException(ErrorCode.COMMENT_DELETE_FORBIDDEN);
         }
 
@@ -83,11 +83,5 @@ public class CommentService {
                     return new CommentResponseDto(comment, likeCount, isWriter, liked);
                 })
                 .collect(Collectors.toList());
-    }
-
-    // 5. 댓글 좋아요 toggle
-    @Transactional
-    public boolean toggleCommentLike(Long commentId, Long userId) {
-        return commentLikeService.toggleCommentLike(commentId, userId);
     }
 }

@@ -1,14 +1,13 @@
 package com.example.b11ndboard.domain.comment.controller;
 
-
 import com.example.b11ndboard.global.security.MemberDetails;
 import com.example.b11ndboard.domain.comment.service.CommentService;
+import com.example.b11ndboard.domain.comment.service.CommentLikeService;
 import com.example.b11ndboard.domain.comment.dto.request.CommentRequestDto;
 import com.example.b11ndboard.domain.comment.dto.response.CommentResponseDto;
 import com.example.b11ndboard.global.common.ApiResponse;
 import com.example.b11ndboard.global.common.ResponseKind;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentApiController {
     private final CommentService commentService;
+    private final CommentLikeService commentLikeService;
 
     // 1. 댓글 작성 API
     @PostMapping("/{postId}/comments")
@@ -51,8 +51,7 @@ public class CommentApiController {
             @RequestBody CommentRequestDto requestDto,
             @AuthenticationPrincipal MemberDetails memberDetails
     ) {
-
-        commentService.updateComment(commentId, memberDetails.getUsername(), requestDto.getContent());
+        commentService.updateComment(commentId, memberDetails.getUserId(), requestDto.getContent());
         return ResponseEntity.ok(ApiResponse.ok("댓글이 수정되었습니다.", ResponseKind.COMMENT_UPDATE, null));
     }
 
@@ -63,8 +62,7 @@ public class CommentApiController {
             @PathVariable Long commentId,
             @AuthenticationPrincipal MemberDetails memberDetails
     ) {
-
-        commentService.deleteComment(commentId, memberDetails.getUsername());
+        commentService.deleteComment(commentId, memberDetails.getUserId());
         return ResponseEntity.ok(ApiResponse.ok("댓글이 삭제되었습니다.", ResponseKind.COMMENT_DELETE, null));
     }
 
@@ -74,8 +72,8 @@ public class CommentApiController {
             @PathVariable Long commentId,
             @AuthenticationPrincipal MemberDetails memberDetails) {
 
-        boolean isLiked = commentService.toggleCommentLike(commentId, memberDetails.getUserId());
+        boolean isLiked = commentLikeService.toggleCommentLike(commentId, memberDetails.getUserId());
         String message = isLiked ? "좋아요를 눌렀습니다." : "좋아요를 취소했습니다.";
-        return ResponseEntity.ok(ApiResponse.ok(message, ResponseKind.COMMENT_CREATE, null));
+        return ResponseEntity.ok(ApiResponse.ok(message, ResponseKind.COMMENT_LIKE, null));
     }
 }
