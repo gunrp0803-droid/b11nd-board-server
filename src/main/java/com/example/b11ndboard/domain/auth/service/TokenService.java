@@ -1,16 +1,13 @@
 package com.example.b11ndboard.domain.auth.service;
 
-import com.example.b11ndboard.domain.auth.dto.response.TokenResponse;
-import com.example.b11ndboard.domain.auth.entity.RefreshToken;
-import com.example.b11ndboard.domain.auth.repository.RefreshTokenRepository;
-import com.example.b11ndboard.domain.user.entity.Role;
+import com.example.b11ndboard.domain.auth.entity.Role;
 import com.example.b11ndboard.global.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 
@@ -18,51 +15,50 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class TokenService {
     private final JwtProvider jwtProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
 
-    @Transactional
-    public TokenResponse generateTokens(String username, Role role, HttpServletResponse response) {
-        // 기존의 해당 유저 리프레시 토큰이 있다면 무효화(삭제)하여 1유저 1토큰 세션 보장
-        refreshTokenRepository.deleteByUsername(username);
-
+    public void generateTokens(String username, Role role, HttpServletResponse response) {
         String accessToken = jwtProvider.generateAccessToken(username, role);
         String refreshToken = jwtProvider.generateRefreshToken(username, role);
 
-        // 새로운 리프레시 토큰 DB 저장
-        RefreshToken tokenEntity = RefreshToken.builder()
-                .token(refreshToken)
-                .username(username)
-                .build();
-        refreshTokenRepository.save(tokenEntity);
-
-        ResponseCookie accessCookie = createCookie("accessToken", accessToken, Duration.ofMillis(jwtProvider.getAccessExpiration()));
-        ResponseCookie refreshCookie = createCookie("refreshToken", refreshToken, Duration.ofMillis(jwtProvider.getRefreshExpiration()));
-
-        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-
-        return new TokenResponse(accessToken, refreshToken);
-    }
-
-    @Transactional
-    public void deleteTokens(String username, HttpServletResponse response) {
-        // 서버 측 리프레시 토큰 무효화(삭제)
-        refreshTokenRepository.deleteByUsername(username);
-
-        ResponseCookie expiredAccessCookie = createCookie("accessToken", "", Duration.ZERO);
-        ResponseCookie expiredRefreshCookie = createCookie("refreshToken", "", Duration.ZERO);
-
-        response.addHeader(HttpHeaders.SET_COOKIE, expiredAccessCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, expiredRefreshCookie.toString());
-    }
-
-    private ResponseCookie createCookie(String name, String value, Duration duration) {
-        return ResponseCookie.from(name, value)
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
                 .path("/")
                 .httpOnly(true)
-                .maxAge(duration)
+                .maxAge(Duration.ofMillis(jwtProvider.getAccessExpiration()))
                 .secure(true)
                 .sameSite("None")
                 .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .path("/")
+                .httpOnly(true)
+                .maxAge(Duration.ofMillis(jwtProvider.getRefreshExpiration()))
+                .secure(true)
+                .sameSite("None")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+    }
+
+    @Transactional
+    public void deleteTokens(Long userId, HttpServletResponse response) {
+
+        ResponseCookie expiredAccessCookie = ResponseCookie.from("accessToken", "")
+                .path("/")
+                .maxAge(0)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .build();
+        ResponseCookie expiredRefreshCookie = ResponseCookie.from("refreshToken", "")
+                .path("/")
+                .maxAge(0)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, expiredAccessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, expiredRefreshCookie.toString());
     }
 }

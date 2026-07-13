@@ -1,9 +1,9 @@
 package com.example.b11ndboard.global.security;
 
-import com.example.b11ndboard.domain.user.entity.Users;
+import com.example.b11ndboard.domain.auth.entity.Users;
 import com.example.b11ndboard.global.exception.ErrorCode;
 import com.example.b11ndboard.global.exception.LoginException;
-import com.example.b11ndboard.domain.user.repository.UsersRepository;
+import com.example.b11ndboard.domain.auth.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

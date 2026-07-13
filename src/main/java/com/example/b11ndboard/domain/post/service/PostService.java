@@ -1,7 +1,7 @@
 package com.example.b11ndboard.domain.post.service;
 
-import com.example.b11ndboard.domain.user.entity.Users;
-import com.example.b11ndboard.domain.user.repository.UsersRepository;
+import com.example.b11ndboard.domain.auth.entity.Users;
+import com.example.b11ndboard.domain.auth.repository.UsersRepository;
 import com.example.b11ndboard.domain.post.dto.request.PostRequestDto;
 import com.example.b11ndboard.domain.post.dto.response.PostResponseDto;
 import com.example.b11ndboard.domain.post.entity.Post;

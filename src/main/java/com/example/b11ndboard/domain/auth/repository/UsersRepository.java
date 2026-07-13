@@ -1,6 +1,6 @@
-package com.example.b11ndboard.domain.user.repository;
+package com.example.b11ndboard.domain.auth.repository;
 
-import com.example.b11ndboard.domain.user.entity.Users;
+import com.example.b11ndboard.domain.auth.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

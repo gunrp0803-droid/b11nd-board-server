@@ -1,6 +1,6 @@
 package com.example.b11ndboard.global.security;
 
-import com.example.b11ndboard.domain.user.entity.Users;
+import com.example.b11ndboard.domain.auth.entity.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

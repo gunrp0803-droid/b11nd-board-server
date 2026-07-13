@@ -2,8 +2,7 @@ package com.example.b11ndboard.domain.auth.controller;
 
 import com.example.b11ndboard.domain.auth.service.AuthService;
 import com.example.b11ndboard.domain.auth.dto.request.LoginRequest;
-import com.example.b11ndboard.domain.auth.dto.response.TokenResponse;
-import com.example.b11ndboard.domain.user.dto.request.SignUpRequest;
+import com.example.b11ndboard.domain.auth.dto.request.SignUpRequest;
 import com.example.b11ndboard.global.security.MemberDetails;
 import com.example.b11ndboard.global.common.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,8 +19,9 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
 
+
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<TokenResponse>> login(
+    public ResponseEntity<ApiResponse<Void>> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletResponse response
     ) {
@@ -29,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<TokenResponse>> refresh(
+    public ResponseEntity<ApiResponse<Void>> refresh(
             HttpServletRequest request,
             HttpServletResponse response
     ) {
@@ -41,6 +41,7 @@ public class AuthController {
             @AuthenticationPrincipal MemberDetails memberDetails,
             HttpServletResponse response
     ) {
+
         return ResponseEntity.ok(authService.logout(memberDetails.getUserId(), response));
     }
 

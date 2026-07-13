@@ -1,4 +1,4 @@
-package com.example.b11ndboard.domain.user.dto.request;
+package com.example.b11ndboard.domain.auth.dto.request;
 
 import jakarta.validation.constraints.*;
 

@@ -1,8 +1,8 @@
 package com.example.b11ndboard.domain.comment.service;
 
 
-import com.example.b11ndboard.domain.user.entity.Users;
-import com.example.b11ndboard.domain.user.repository.UsersRepository;
+import com.example.b11ndboard.domain.auth.entity.Users;
+import com.example.b11ndboard.domain.auth.repository.UsersRepository;
 import com.example.b11ndboard.domain.comment.entity.Comment;
 import com.example.b11ndboard.domain.comment.repository.CommentRepository;
 import com.example.b11ndboard.domain.comment.entity.CommentLike;

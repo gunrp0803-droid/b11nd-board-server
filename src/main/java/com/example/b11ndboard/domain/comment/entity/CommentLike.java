@@ -1,6 +1,6 @@
 package com.example.b11ndboard.domain.comment.entity;
 
-import com.example.b11ndboard.domain.user.entity.Users;
+import com.example.b11ndboard.domain.auth.entity.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
