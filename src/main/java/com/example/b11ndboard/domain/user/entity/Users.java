@@ -1,6 +1,6 @@
-package com.example.b11ndboard.domain.auth.entity;
+package com.example.b11ndboard.domain.user.entity;
 
-import com.example.b11ndboard.domain.auth.dto.request.SignUpRequest;
+import com.example.b11ndboard.domain.user.dto.request.SignUpRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

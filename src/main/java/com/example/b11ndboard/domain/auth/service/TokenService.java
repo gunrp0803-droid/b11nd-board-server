@@ -1,6 +1,6 @@
 package com.example.b11ndboard.domain.auth.service;
 
-import com.example.b11ndboard.domain.auth.entity.Role;
+import com.example.b11ndboard.domain.user.entity.Role;
 import com.example.b11ndboard.global.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;

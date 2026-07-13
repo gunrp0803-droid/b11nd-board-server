@@ -1,13 +1,13 @@
 package com.example.b11ndboard.domain.auth.service;
 
 import com.example.b11ndboard.domain.auth.dto.request.LoginRequest;
-import com.example.b11ndboard.domain.auth.dto.request.SignUpRequest;
+import com.example.b11ndboard.domain.user.dto.request.SignUpRequest;
 import com.example.b11ndboard.global.jwt.JwtProvider;
 import com.example.b11ndboard.global.common.ApiResponse;
 import com.example.b11ndboard.global.common.ResponseKind;
-import com.example.b11ndboard.domain.auth.entity.Users;
+import com.example.b11ndboard.domain.user.entity.Users;
 import com.example.b11ndboard.global.exception.LoginException;
-import com.example.b11ndboard.domain.auth.repository.UsersRepository;
+import com.example.b11ndboard.domain.user.repository.UsersRepository;
 import com.example.b11ndboard.global.exception.SignUpException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
