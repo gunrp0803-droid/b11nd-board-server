@@ -8,8 +8,8 @@ import com.example.b11ndboard.domain.post.entity.Post;
 import com.example.b11ndboard.domain.post.entity.PostLike;
 import com.example.b11ndboard.global.exception.ErrorCode;
 import com.example.b11ndboard.domain.post.exception.PostException;
-import com.example.b11ndboard.domain.post.repository.PostLikeRepository;
 import com.example.b11ndboard.domain.post.repository.PostRepository;
+import com.example.b11ndboard.domain.post.repository.PostLikeRepository;
 import com.example.b11ndboard.domain.comment.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -49,40 +49,33 @@ public class PostService {
         return new PostResponseDto(savedPost, username);
     }
 
-    // 2. 전체 게시글 목록 조회
-    public List<PostResponseDto> getAllPosts() {
-        List<Post> posts = postRepository.findAll();
-        List<Long> userIds = posts.stream()
-                .map(Post::getUserId)
-                .distinct()
-                .collect(Collectors.toList());
-
-        Map<Long, String> userIdToUsernameMap = usersRepository.findAllById(userIds).stream()
-                .collect(Collectors.toMap(Users::getId, Users::getUsername));
-
-        return posts.stream()
-                .map(post -> {
-                    long likeCount = postLikeRepository.countByPost(post);
-                    long commentCount = commentRepository.countByPostId(post.getId());
-                    String username = userIdToUsernameMap.getOrDefault(post.getUserId(), "알 수 없음");
-                    return new PostResponseDto(post, username, likeCount, false, commentCount, false);
-                })
-                .collect(Collectors.toList());
-    }
-
-    // 3. 게시글 상세 조회
-    public PostResponseDto getPost(Long postId) {
+    // 2. 게시글 상세 조회
+    public PostResponseDto getPost(Long postId, Long userId) {
+        // 1. 게시글 존재 여부 확인
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
+
+        // 2. 총 좋아요 개수
         long likeCount = postLikeRepository.countByPost(post);
+
+        // 3. 좋아요 클릭 여부
+        boolean liked = (userId != null) && postLikeRepository.existsByUserIdAndPost(userId, post);
+
+        // 4. 총 댓글 개수
         long commentCount = commentRepository.countByPostId(postId);
+
+        // 5. 작성자 이름 조회 (삭제된 유저인 경우 "알 수 없음" 반환)
         String username = usersRepository.findById(post.getUserId())
                 .map(Users::getUsername)
                 .orElse("알 수 없음");
-        return new PostResponseDto(post, username, likeCount, false, commentCount, false);
+
+        // 6. 작성자 판별
+        boolean isWriter = (userId != null) && post.getUserId().equals(userId);
+
+        return new PostResponseDto(post, username, likeCount, liked, commentCount, isWriter);
     }
 
-    // 4. 게시글 수정
+    // 3. 게시글 수정
     @Transactional
     public PostResponseDto updatePost(Long postId, PostRequestDto requestDto, Long userId) {
         Post post = postRepository.findById(postId)
@@ -103,7 +96,7 @@ public class PostService {
         return new PostResponseDto(post, username, likeCount, liked, commentCount, true);
     }
 
-    // 5. 게시글 삭제
+    // 4. 게시글 삭제
     @Transactional
     public void deletePost(Long postId, Long userId) {
         Post post = postRepository.findById(postId)
@@ -117,7 +110,7 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    // 6. 좋아요 로직
+    // 5. 좋아요 로직
     @Transactional
     public void likePost(Long postId, Long userId) {
         Post post = postRepository.findById(postId)
@@ -134,69 +127,56 @@ public class PostService {
 
         postLikeRepository.save(postLike);
     }
-    public Page<PostResponseDto> getAllPosts(int page){
-        return getAllPosts(page, null);
-    }
 
+    // 6. 전체 게시글 목록 조회 (N+1 / 3N+2 배치 쿼리 최적화 완료)
     public Page<PostResponseDto> getAllPosts(int page, Long userId){
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Page<Post> postPage = postRepository.findAll(pageable);
+        List<Post> posts = postPage.getContent();
 
-        List<Long> userIds = postPage.getContent().stream()
+        List<Long> userIds = posts.stream()
                 .map(Post::getUserId)
                 .distinct()
                 .collect(Collectors.toList());
 
+        // 1. 유저 ID -> Username 일괄 매핑 (삭제된 유저는 "알 수 없음"으로 표시)
         Map<Long, String> userIdToUsernameMap = usersRepository.findAllById(userIds).stream()
                 .collect(Collectors.toMap(Users::getId, Users::getUsername));
 
+        // 2. 게시글 ID -> 좋아요 개수 일괄 매핑
+        Map<Long, Long> postLikeCountMap = postLikeRepository.countLikesByPosts(posts).stream()
+                .collect(Collectors.toMap(row -> (Long) row[0], row -> (Long) row[1]));
+
+        // 3. 게시글 ID -> 댓글 개수 일괄 매핑
+        Map<Long, Long> postCommentCountMap = commentRepository.countCommentsByPosts(posts).stream()
+                .collect(Collectors.toMap(row -> (Long) row[0], row -> (Long) row[1]));
+
+        // 4. 로그인한 유저가 좋아요한 게시글 ID 일괄 조회 세트
+        java.util.Set<Long> likedPostIds = new java.util.HashSet<>();
+        if (userId != null && !posts.isEmpty()) {
+            likedPostIds.addAll(postLikeRepository.findLikedPostIdsByUserIdAndPosts(userId, posts));
+        }
+
         return postPage.map(post -> {
-            long likeCount = postLikeRepository.countByPost(post);
-            long commentCount = commentRepository.countByPostId(post.getId());
-            boolean liked = (userId != null) && postLikeRepository.existsByUserIdAndPost(userId, post);
+            long likeCount = postLikeCountMap.getOrDefault(post.getId(), 0L);
+            long commentCount = postCommentCountMap.getOrDefault(post.getId(), 0L);
+            boolean liked = likedPostIds.contains(post.getId());
             boolean isWriter = (userId != null) && post.getUserId().equals(userId);
             String username = userIdToUsernameMap.getOrDefault(post.getUserId(), "알 수 없음");
             return new PostResponseDto(post, username, likeCount, liked, commentCount, isWriter);
         });
     }
-    public PostResponseDto getPost(Long postId, Long userId) {
-        // 1. 게시글이 존재하는지 확인
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
 
-        // 2. 이 게시글의 총 좋아요 개수 가져오기
-        long likeCount = postLikeRepository.countByPost(post);
-
-        // 3. 현재 로그인한 유저가 이 글에 좋아요를 눌렀는지 여부 가져오기
-        boolean liked = (userId != null) && postLikeRepository.existsByUserIdAndPost(userId, post);
-
-        // 4. 댓글 개수 가져오기
-        long commentCount = commentRepository.countByPostId(postId);
-
-        // 5. 작성자 이름 가져오기
-        String username = usersRepository.findById(post.getUserId())
-                .map(Users::getUsername)
-                .orElse("알 수 없음");
-
-        // 6. 작성자 판별
-        boolean isWriter = (userId != null) && post.getUserId().equals(userId);
-
-        // 7. 확장된 DTO 생성자를 통해 최종 결과 반환
-        return new PostResponseDto(post, username, likeCount, liked, commentCount, isWriter);
-    }
     // 7. 게시글 좋아요 취소 로직
     @Transactional
     public void cancelPostLike(Long postId, Long userId) {
-        // 1. 게시글 존재 여부 확인
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
 
-        // 2. 해당 유저가 이 게시글에 누른 좋아요가 있는지 확인 (기존 Users -> Long userId 기반 조회로 변경)
         PostLike postLike = postLikeRepository.findByUserIdAndPost(userId, post)
                 .orElseThrow(() -> new PostException(ErrorCode.LIKE_NOT_FOUND));
 
-        // 3. 좋아요 삭제
         postLikeRepository.delete(postLike);
     }
 }
