@@ -39,8 +39,6 @@ public class AuthService {
     }
 
     public ApiResponse<Void> login(LoginRequest request, HttpServletResponse response) {
-        validateValue(request.username(), request.password());
-
         Users users = usersRepository.findByUsername(request.username())
                 .orElseThrow(() -> new LoginException(LOGIN_FAILED));
 
@@ -51,16 +49,6 @@ public class AuthService {
         tokenService.generateTokens(users.getUsername(), users.getRole(), response);
 
         return ApiResponse.ok("로그인 성공", ResponseKind.LOGIN, null);
-    }
-
-    private void validateValue(String username, String password) {
-        if (username == null || username.isBlank()) {
-            throw new LoginException(LOGIN_FAILED);
-        }
-
-        if (password == null || password.isBlank()) {
-            throw new LoginException(LOGIN_FAILED);
-        }
     }
 
     public ApiResponse<Void> refresh(HttpServletRequest request, HttpServletResponse response) {

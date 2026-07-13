@@ -28,11 +28,6 @@ public class CommentApiController {
             @AuthenticationPrincipal MemberDetails memberDetails,
             @RequestBody CommentRequestDto dto) {
 
-        if (memberDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.fail("로그인이 필요합니다.", ResponseKind.VALIDATION_ERROR));
-        }
-
         commentService.saveComment(postId, dto, memberDetails.getUserId(), memberDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.ok("댓글이 등록되었습니다.", ResponseKind.COMMENT_CREATE, null));
     }
@@ -56,10 +51,6 @@ public class CommentApiController {
             @RequestBody CommentRequestDto requestDto,
             @AuthenticationPrincipal MemberDetails memberDetails
     ) {
-        if (memberDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.fail("로그인이 필요합니다.", ResponseKind.VALIDATION_ERROR));
-        }
 
         commentService.updateComment(commentId, memberDetails.getUsername(), requestDto.getContent());
         return ResponseEntity.ok(ApiResponse.ok("댓글이 수정되었습니다.", ResponseKind.COMMENT_UPDATE, null));
@@ -72,10 +63,6 @@ public class CommentApiController {
             @PathVariable Long commentId,
             @AuthenticationPrincipal MemberDetails memberDetails
     ) {
-        if (memberDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.fail("로그인이 필요합니다.", ResponseKind.VALIDATION_ERROR));
-        }
 
         commentService.deleteComment(commentId, memberDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.ok("댓글이 삭제되었습니다.", ResponseKind.COMMENT_DELETE, null));
@@ -86,11 +73,6 @@ public class CommentApiController {
     public ResponseEntity<ApiResponse<Void>> toggleLike(
             @PathVariable Long commentId,
             @AuthenticationPrincipal MemberDetails memberDetails) {
-
-        if (memberDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.fail("로그인이 필요합니다.", ResponseKind.VALIDATION_ERROR));
-        }
 
         boolean isLiked = commentService.toggleCommentLike(commentId, memberDetails.getUserId());
         String message = isLiked ? "좋아요를 눌렀습니다." : "좋아요를 취소했습니다.";

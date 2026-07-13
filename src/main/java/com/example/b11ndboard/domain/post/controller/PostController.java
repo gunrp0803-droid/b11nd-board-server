@@ -65,11 +65,6 @@ public class PostController {
             @AuthenticationPrincipal MemberDetails memberDetails,
             @Valid @RequestBody PostRequestDto requestDto) {
 
-        if (memberDetails == null) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.fail("로그인이 필요합니다.", ResponseKind.VALIDATION_ERROR));
-        }
-
         PostResponseDto response = postService.updatePost(postId, requestDto, memberDetails.getUserId());
         return ResponseEntity.ok(
                 ApiResponse.ok("게시글이 성공적으로 수정되었습니다.", ResponseKind.POST_UPDATE, response)
@@ -81,11 +76,6 @@ public class PostController {
     public ResponseEntity<ApiResponse<Void>> deletePost(
             @PathVariable Long postId,
             @AuthenticationPrincipal MemberDetails memberDetails) {
-
-        if (memberDetails == null) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.fail("로그인이 필요합니다.", ResponseKind.VALIDATION_ERROR));
-        }
 
         postService.deletePost(postId, memberDetails.getUserId());
         return ResponseEntity.ok(ApiResponse.ok("게시글이 성공적으로 삭제되었습니다.", ResponseKind.POST_DELETE, null));
