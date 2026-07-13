@@ -48,7 +48,7 @@ public class AuthService {
 
         usersRepository.save(users);
 
-        return ApiResponse.ok("회원가입 성공", ResponseKind.SIGNUP, null);
+        return ApiResponse.ok("회원가입 성공", ResponseKind.SIGNUP);
     }
 
     @Transactional
@@ -96,6 +96,6 @@ public class AuthService {
                 .orElseThrow(() -> new LoginException(LOGIN_FAILED));
 
         tokenService.deleteTokens(users.getUsername(), response);
-        return ApiResponse.ok("로그아웃 성공", ResponseKind.LOGOUT, null);
+        return ApiResponse.ok("로그아웃 성공", ResponseKind.LOGOUT);
     }
 }

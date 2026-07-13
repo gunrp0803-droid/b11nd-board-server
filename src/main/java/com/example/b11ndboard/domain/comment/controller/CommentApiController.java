@@ -29,7 +29,7 @@ public class CommentApiController {
             @RequestBody CommentRequestDto dto) {
 
         commentService.saveComment(postId, dto, memberDetails.getUserId(), memberDetails.getUsername());
-        return ResponseEntity.ok(ApiResponse.ok("댓글이 등록되었습니다.", ResponseKind.COMMENT_CREATE, null));
+        return ResponseEntity.ok(ApiResponse.ok("댓글이 등록되었습니다.", ResponseKind.COMMENT_CREATE));
     }
 
     // 2. 댓글 목록 조회 API
@@ -52,7 +52,7 @@ public class CommentApiController {
             @AuthenticationPrincipal MemberDetails memberDetails
     ) {
         commentService.updateComment(commentId, memberDetails.getUserId(), requestDto.getContent());
-        return ResponseEntity.ok(ApiResponse.ok("댓글이 수정되었습니다.", ResponseKind.COMMENT_UPDATE, null));
+        return ResponseEntity.ok(ApiResponse.ok("댓글이 수정되었습니다.", ResponseKind.COMMENT_UPDATE));
     }
 
     // 4. 댓글 삭제 API
@@ -63,7 +63,7 @@ public class CommentApiController {
             @AuthenticationPrincipal MemberDetails memberDetails
     ) {
         commentService.deleteComment(commentId, memberDetails.getUserId());
-        return ResponseEntity.ok(ApiResponse.ok("댓글이 삭제되었습니다.", ResponseKind.COMMENT_DELETE, null));
+        return ResponseEntity.ok(ApiResponse.ok("댓글이 삭제되었습니다.", ResponseKind.COMMENT_DELETE));
     }
 
     // 5. 댓글 좋아요 toggle API
@@ -74,6 +74,6 @@ public class CommentApiController {
 
         boolean isLiked = commentLikeService.toggleCommentLike(commentId, memberDetails.getUserId());
         String message = isLiked ? "좋아요를 눌렀습니다." : "좋아요를 취소했습니다.";
-        return ResponseEntity.ok(ApiResponse.ok(message, ResponseKind.COMMENT_LIKE, null));
+        return ResponseEntity.ok(ApiResponse.ok(message, ResponseKind.COMMENT_LIKE));
     }
 }

@@ -27,6 +27,10 @@ public class ApiResponse<T> {
         return new ApiResponse<>(true, message, kind, data);
     }
 
+    public static ApiResponse<Void> ok(String message, ResponseKind kind) {
+        return new ApiResponse<>(true, message, kind, null);
+    }
+
     public static <T> ApiResponse<T> fail(String message, ResponseKind kind) {
         return new ApiResponse<>(false, message, kind, null);
     }

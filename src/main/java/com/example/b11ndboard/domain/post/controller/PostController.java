@@ -78,7 +78,7 @@ public class PostController {
             @AuthenticationPrincipal MemberDetails memberDetails) {
 
         postService.deletePost(postId, memberDetails.getUserId());
-        return ResponseEntity.ok(ApiResponse.ok("게시글이 성공적으로 삭제되었습니다.", ResponseKind.POST_DELETE, null));
+        return ResponseEntity.ok(ApiResponse.ok("게시글이 성공적으로 삭제되었습니다.", ResponseKind.POST_DELETE));
     }
 
     // 6. 특정 게시글에 좋아요 누르기 API
@@ -88,7 +88,7 @@ public class PostController {
             @AuthenticationPrincipal MemberDetails memberDetails) {
 
         postService.likePost(postId, memberDetails.getUserId());
-        return ResponseEntity.ok(ApiResponse.ok("좋아요 반영", ResponseKind.POST_LIKE, null));
+        return ResponseEntity.ok(ApiResponse.ok("좋아요 반영", ResponseKind.POST_LIKE));
     }
     // 7. 게시글 좋아요 취소 api
     @DeleteMapping("/{postId}/likes") // 주소 경로(/{postId}/likes)를 추가했습니다.
@@ -100,6 +100,6 @@ public class PostController {
         postService.cancelPostLike(postId, memberDetails.getUserId());
 
         // 기존의 일관된 API 응답 규격(ApiResponse) 형태로 반환합니다.
-        return ResponseEntity.ok(ApiResponse.ok("좋아요가 취소되었습니다.", ResponseKind.POST_LIKE_CANCEL, null));
+        return ResponseEntity.ok(ApiResponse.ok("좋아요가 취소되었습니다.", ResponseKind.POST_LIKE_CANCEL));
     }
 }
