@@ -1,4 +1,4 @@
-package com.example.b11ndboard.domain.auth.entity;
+package com.example.b11ndboard.domain.user.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

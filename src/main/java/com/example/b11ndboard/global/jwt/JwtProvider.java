@@ -1,6 +1,6 @@
 package com.example.b11ndboard.global.jwt;
 
-import com.example.b11ndboard.domain.auth.entity.Role;
+import com.example.b11ndboard.domain.user.entity.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

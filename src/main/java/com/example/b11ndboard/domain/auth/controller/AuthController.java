@@ -2,7 +2,7 @@ package com.example.b11ndboard.domain.auth.controller;
 
 import com.example.b11ndboard.domain.auth.service.AuthService;
 import com.example.b11ndboard.domain.auth.dto.request.LoginRequest;
-import com.example.b11ndboard.domain.auth.dto.request.SignUpRequest;
+import com.example.b11ndboard.domain.auth.dto.response.TokenResponse;
 import com.example.b11ndboard.global.security.MemberDetails;
 import com.example.b11ndboard.global.common.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +21,7 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<Void>> login(
+    public ResponseEntity<ApiResponse<TokenResponse>> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletResponse response
     ) {
@@ -29,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<Void>> refresh(
+    public ResponseEntity<ApiResponse<TokenResponse>> refresh(
             HttpServletRequest request,
             HttpServletResponse response
     ) {
@@ -38,17 +38,12 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
-            @AuthenticationPrincipal MemberDetails memberDetails,
+            HttpServletRequest request,
             HttpServletResponse response
     ) {
 
-        return ResponseEntity.ok(authService.logout(memberDetails.getUserId(), response));
+        return ResponseEntity.ok(authService.logout(request, response));
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<Void>> signUp(
-            @Valid @RequestBody SignUpRequest request
-    ) {
-        return ResponseEntity.ok(authService.signUp(request));
-    }
+
 }
