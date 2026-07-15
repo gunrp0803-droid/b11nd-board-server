@@ -1,44 +1,33 @@
 package com.example.b11ndboard.domain.auth.service;
 
 import com.example.b11ndboard.domain.auth.dto.response.TokenResponse;
-import com.example.b11ndboard.domain.auth.entity.RefreshToken;
 import com.example.b11ndboard.domain.user.entity.Role;
-import com.example.b11ndboard.domain.auth.repository.RefreshTokenRepository;
 import com.example.b11ndboard.global.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class TokenService {
     private final JwtProvider jwtProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    @Transactional
     public TokenResponse generateTokens(String username, Role role, HttpServletResponse response) {
         String accessToken = jwtProvider.generateAccessToken(username, role);
         String refreshToken = jwtProvider.generateRefreshToken(username, role);
 
-        LocalDateTime expiryDate = LocalDateTime.now().plus(Duration.ofMillis(jwtProvider.getRefreshExpiration()));
-        refreshTokenRepository.findByUsername(username)
-                .ifPresentOrElse(
-                        token -> token.updateToken(refreshToken, expiryDate),
-                        () -> refreshTokenRepository.save(
-                                RefreshToken.builder()
-                                        .username(username)
-                                        .token(refreshToken)
-                                        .expiryDate(expiryDate)
-                                        .build()
-                        )
-                );
+        redisTemplate.opsForValue().set(
+                "RT:" + refreshToken,
+                username,
+                Duration.ofMillis(jwtProvider.getRefreshExpiration())
+        );
 
         ResponseCookie accessCookie = createCookie("accessToken", accessToken, jwtProvider.getAccessExpiration());
         ResponseCookie refreshCookie = createCookie("refreshToken", refreshToken, jwtProvider.getRefreshExpiration());
@@ -49,11 +38,11 @@ public class TokenService {
         return new TokenResponse(accessToken, refreshToken);
     }
 
-    @Transactional
     public void deleteTokens(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = jwtProvider.resolveRefreshToken(request);
+
         if (refreshToken != null) {
-            refreshTokenRepository.deleteByToken(refreshToken);
+            redisTemplate.delete("RT:" + refreshToken);
         }
 
         ResponseCookie expiredAccessCookie = createCookie("accessToken", "", 0);
@@ -64,9 +53,7 @@ public class TokenService {
     }
 
     public boolean isRefreshTokenExists(String token) {
-        return refreshTokenRepository.findByToken(token)
-                .map(refreshToken -> refreshToken.getExpiryDate().isAfter(LocalDateTime.now()))
-                .orElse(false);
+        return Boolean.TRUE.equals(redisTemplate.hasKey("RT:" + token));
     }
 
     private ResponseCookie createCookie(String name, String value, long maxAgeMillis) {
