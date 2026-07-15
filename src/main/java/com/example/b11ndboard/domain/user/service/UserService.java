@@ -19,15 +19,15 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public ApiResponse<Void> signUp(SignUpRequest request) throws SignUpException {
-        if (usersRepository.existsByUsername(request.username())) {
+        if (usersRepository.existsByUsername(request.getUsername())) {
             throw new SignUpException(SIGNUP_USERNAME_USED);
         }
 
-        if (usersRepository.existsByEmail(request.email())) {
+        if (usersRepository.existsByEmail(request.getEmail())) {
             throw new SignUpException(SIGNUP_EMAIL_USED);
         }
 
-        usersRepository.save(Users.toEntity(request, passwordEncoder.encode(request.password())));
+        usersRepository.save(Users.toEntity(request, passwordEncoder.encode(request.getPassword())));
         return ApiResponse.ok("회원가입에 성공했습니다.", ResponseKind.SIGNUP, null);
     }
 }

@@ -27,10 +27,10 @@ public class AuthService {
 
 
     public ApiResponse<TokenResponse> login(LoginRequest request, HttpServletResponse response) {
-        Users users = usersRepository.findByUsername(request.username())
+        Users users = usersRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new LoginException(LOGIN_FAILED));
 
-        if (!passwordEncoder.matches(request.password(), users.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), users.getPassword())) {
             throw new LoginException(LOGIN_FAILED);
         }
 

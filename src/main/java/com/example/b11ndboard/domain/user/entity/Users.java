@@ -35,9 +35,9 @@ public class Users {
 
     public static Users toEntity(SignUpRequest request, String password) {
         return Users.builder()
-                .username(request.username())
+                .username(request.getUsername())
                 .password(password)
-                .email(request.email())
+                .email(request.getEmail())
                 .role(Role.USER)
                 .build();
     }

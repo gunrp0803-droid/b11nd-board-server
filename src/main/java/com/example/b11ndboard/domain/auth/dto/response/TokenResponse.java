@@ -1,6 +1,11 @@
 package com.example.b11ndboard.domain.auth.dto.response;
 
-public record TokenResponse(
-        String accessToken,
-        String refreshToken
-) {}
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public class TokenResponse {
+    private final String accessToken;
+    private final String refreshToken;
+}
